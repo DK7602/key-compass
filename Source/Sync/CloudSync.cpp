@@ -37,8 +37,13 @@ namespace kcsync
         {
             int status = 0;
             const auto url = URL (baseUrl + "/v1/" + op).withPOSTData (body);
+           #if JUCE_ANDROID
+            const String newLine = "\n";      // JUCE's Android stream splits the headers on \n; a \r left behind is refused
+           #else
+            const String newLine = "\r\n";
+           #endif
             const auto options = URL::InputStreamOptions (URL::ParameterHandling::inPostData)
-                                     .withExtraHeaders ("Content-Type: application/json\r\nAuthorization: Bearer " + code)
+                                     .withExtraHeaders ("Content-Type: application/json" + newLine + "Authorization: Bearer " + code + newLine)
                                      .withConnectionTimeoutMs (8000)
                                      .withStatusCode (&status)
                                      .withNumRedirectsToFollow (0);
@@ -235,7 +240,16 @@ namespace kcsync
             c = code;
         }
         if (c.isEmpty()) return {};
-        return transport (op, c, JSON::toString (body, true));
+        return send (op, c, body);
+    }
+
+    CloudSync::Reply CloudSync::send (const String& op, const String& c, const var& body)
+    {
+        // the code also goes in the body, in case a platform loses the Authorization header on the way
+        auto withCode = body.isObject() ? body : object ({});
+        if (auto* o = withCode.getDynamicObject())
+            o->setProperty ("auth", c);
+        return transport (op, c, JSON::toString (withCode, true));
     }
 
     bool CloudSync::handleRefusal (const Reply& r)
@@ -442,7 +456,7 @@ namespace kcsync
         post ([this, done, token]
         {
             const auto c = newCode();
-            const auto r = transport ("create", c, "{}");
+            const auto r = send ("create", c, object ({}));
             const bool ok = r.reached && (bool) r.json["ok"];
             if (ok)
             {
@@ -475,7 +489,7 @@ namespace kcsync
         std::weak_ptr<bool> token = alive;
         post ([this, c, done, token]
         {
-            const auto r = transport ("join", c, "{}");
+            const auto r = send ("join", c, object ({}));
             const bool ok = r.reached && (bool) r.json["ok"];
             if (ok)
             {

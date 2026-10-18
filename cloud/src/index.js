@@ -2,7 +2,7 @@
 //
 // Every device that knows the same sync code shares one set of songs (and starred progressions).
 // The apps talk to it with POST requests carrying JSON, the code in an "Authorization: Bearer <code>"
-// header, and always get JSON back with "ok": true or false (and "error" saying why).
+// header or as "auth" in the JSON, and always get JSON back with "ok": true or false (and "error" saying why).
 //
 //   POST /v1/create   make the account for a new code (fine to repeat)
 //   POST /v1/join     check a code typed on another device: { ok } or { ok: false, error: "unknown-code" }
@@ -42,10 +42,6 @@ async function handle(request, env) {
     if (request.method !== 'POST' || !url.pathname.startsWith('/v1/'))
         return json({ ok: false, error: 'not-found' }, 404);
 
-    const code = normaliseCode((request.headers.get('Authorization') || '').replace(/^Bearer\s+/i, ''));
-    if (!code)
-        return json({ ok: false, error: 'bad-code' });
-
     const length = Number(request.headers.get('Content-Length') || 0);
     if (length > MAX_BODY)
         return json({ ok: false, error: 'too-big' });
@@ -59,6 +55,12 @@ async function handle(request, env) {
     }
     if (typeof body !== 'object' || body === null || Array.isArray(body))
         return json({ ok: false, error: 'bad-json' });
+
+    // the code comes in the Authorization header, or as "auth" in the body (some platforms mangle headers)
+    const code = normaliseCode((request.headers.get('Authorization') || '').replace(/^\s*Bearer\s+/i, ''))
+              || normaliseCode(body.auth);
+    if (!code)
+        return json({ ok: false, error: 'bad-code' });
 
     const account = await accountId(code);
     const db = env.DB;

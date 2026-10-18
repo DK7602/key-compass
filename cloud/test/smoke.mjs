@@ -27,6 +27,12 @@ const health = await (await fetch(`${base}/v1/health`)).json();
 check('health', health.ok === true, health);
 check('a made-up code is refused', (await call('join', other)).error === 'unknown-code');
 check('a malformed code is refused', (await call('join', 'hello')).error === 'bad-code');
+{
+    const viaBody = await fetch(`${base}/v1/create`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                                                       body: JSON.stringify({ auth: other }) });
+    check('the code can come in the body instead of the header', (await viaBody.json()).ok === true);
+    await call('forget', other);
+}
 check('create a new code', (await call('create', code)).created === true);
 check('create again is fine', (await call('create', code)).ok === true);
 check('join with it, typed with dashes', (await call('join', pretty)).ok === true);

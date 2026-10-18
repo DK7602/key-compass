@@ -58,6 +58,7 @@ namespace kcsync
         void applyFavourites (const juce::var& item);
         void keepBoth (const Entry& local, const juce::var& remote);
         Reply call (const juce::String& op, const juce::var& body);
+        Reply send (const juce::String& op, const juce::String& code, const juce::var& body);
         bool handleRefusal (const Reply&);
         void setStatus (Status, const juce::String& detail = {});
         void loadState();
