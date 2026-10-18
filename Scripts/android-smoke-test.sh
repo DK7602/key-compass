@@ -19,7 +19,9 @@ alive() {
 adb install -r "$apk" 2>&1 | tee "$out/install.txt"
 adb shell pm grant "$pkg" android.permission.RECORD_AUDIO || true
 adb logcat -c
-adb shell am start -W -n "$pkg/com.rmsl.juce.JuceActivity" | tee "$out/start.txt"
+# open it the way the launcher does (the activity's class depends on the JUCE settings)
+adb shell cmd package resolve-activity --brief -c android.intent.category.LAUNCHER "$pkg" | tee "$out/start.txt"
+adb shell monkey -p "$pkg" -c android.intent.category.LAUNCHER 1 >> "$out/start.txt" 2>&1
 shot 1-start 25
 alive "start"
 
@@ -58,7 +60,7 @@ alive "turning"
 # away and back (the app saves itself and stops the microphone, then starts again)
 adb shell input keyevent KEYCODE_HOME
 sleep 4
-adb shell am start -n "$pkg/com.rmsl.juce.JuceActivity" > /dev/null
+adb shell monkey -p "$pkg" -c android.intent.category.LAUNCHER 1 > /dev/null 2>&1
 shot 10-back 8
 alive "leaving and coming back"
 

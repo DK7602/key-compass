@@ -211,6 +211,7 @@ public:
         {
             addAndMakeVisible (*w);
             w->setInterceptsMouseClicks (false, false);
+            w->setOpaque (true);         // the page art fills it: nothing behind needs drawing when the needle moves
         }
         winA.addAndMakeVisible (stageA);
         winB.addAndMakeVisible (stageB);
