@@ -8,9 +8,26 @@ pkg=com.keycompass.app
 
 shot() {
     sleep "${2:-4}"
+    clear_dialogs
     adb exec-out screencap -p > "$out/$1.png"
     if command -v convert > /dev/null; then convert "$out/$1.png" -resize 50% -quality 82 "$out/$1.jpg" && rm "$out/$1.png"; fi
     echo "shot $1"
+}
+# the emulator's own apps sometimes freeze on a slow test machine, and their "isn't responding" box would
+# swallow the taps: close that app (never Key Compass - if it is Key Compass, that's a failure to report)
+clear_dialogs() {
+    local who
+    who=$(adb shell dumpsys window windows 2> /dev/null | grep -o "Application \(Not Responding\|Error\): [a-zA-Z0-9._:]*" | head -1)
+    [ -z "$who" ] && return
+    local app=${who##*: }
+    if [ "${app%%:*}" = "$pkg" ]; then
+        echo "KEY COMPASS DIALOG: $who" | tee -a "$out/result.txt"
+        adb shell screencap -p > "$out/dialog-$(date +%s).png"
+    else
+        echo "closed a system box: $who" >> "$out/result.txt"
+        adb shell am force-stop "${app%%:*}"
+    fi
+    sleep 2
 }
 alive() {
     if adb shell pidof "$pkg" > /dev/null; then echo "running after $1"; else echo "NOT RUNNING after $1" | tee -a "$out/result.txt"; fi
@@ -21,6 +38,7 @@ alive() {
 until [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1" ]; do sleep 2; done
 sleep 45
 adb shell input keyevent KEYCODE_WAKEUP
+adb shell settings put global hide_error_dialogs 1 || true
 adb shell wm dismiss-keyguard 2> /dev/null || true
 
 adb install -r "$apk" 2>&1 | tee "$out/install.txt"
@@ -40,8 +58,10 @@ w=${size%x*}; h=${size#*x}
 dpi=$(adb shell wm density | grep -o '[0-9]*' | tail -1)
 echo "screen ${w}x${h} at ${dpi} dpi" | tee -a "$out/result.txt"
 navbar=$(( 48 * dpi / 160 ))
+# gesture navigation (mode 2) leaves only a thin handle at the bottom
+[ "$(adb shell settings get secure navigation_mode | tr -d '\r')" = "2" ] && navbar=$(( 24 * dpi / 160 ))
 tabY=$(( h - navbar - 35 * dpi / 160 ))
-tab() { adb shell input tap $(( w * (2 * $1 + 1) / 10 )) "$tabY"; }
+tab() { clear_dialogs; adb shell input tap $(( w * (2 * $1 + 1) / 10 )) "$tabY"; }
 
 tab 1; shot 2-chords
 tab 2; shot 3-song
@@ -52,6 +72,7 @@ alive "the tabs"
 
 # press and hold the first progression card on the chords tab (its menu)
 tab 1; sleep 3
+clear_dialogs
 adb shell input swipe $(( w * 16 / 100 )) $(( h * 47 / 100 )) $(( w * 16 / 100 )) $(( h * 47 / 100 )) 900
 shot 7-card-menu 2
 adb shell input keyevent KEYCODE_BACK
