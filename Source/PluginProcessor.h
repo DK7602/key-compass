@@ -6,6 +6,10 @@
 #include "SongMapper/SongModel.h"
 #include "SongMapper/Audition.h"
 
+#ifndef JucePlugin_Name
+ #define JucePlugin_Name "Key Compass"      // the Android app is not built as a plug-in
+#endif
+
 class KeyCompassProcessor : public juce::AudioProcessor, private juce::AsyncUpdater, private juce::ChangeListener
 {
 public:

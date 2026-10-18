@@ -1,0 +1,139 @@
+# Builds the Key Compass Android app (an .apk you install on the phone) on every push to main.
+# The finished app goes on the "Android app" release page:
+#   https://github.com/<you>/key-compass/releases/latest  ->  KeyCompass.apk
+name: Android app
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write          # to publish the .apk on the release page
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JUCE_VERSION: 8.0.15
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get JUCE ${{ env.JUCE_VERSION }}
+        run: git clone --depth 1 --branch "$JUCE_VERSION" https://github.com/juce-framework/JUCE.git JUCE
+
+      # The Projucer turns Android/KeyCompassMobile.jucer into an Android Studio project. It takes a few
+      # minutes to build, so it is kept between runs.
+      - name: Projucer (cached)
+        id: projucer
+        uses: actions/cache@v4
+        with:
+          path: tools/Projucer
+          key: projucer-${{ env.JUCE_VERSION }}-ubuntu-24.04-v1
+
+      - name: Build the Projucer
+        if: steps.projucer.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libfreetype-dev libfontconfig1-dev \
+              libcurl4-openssl-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxext-dev libasound2-dev
+          cmake -S JUCE -B build-projucer -G Ninja -DJUCE_BUILD_EXTRAS=ON -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-projucer --target Projucer
+          mkdir -p tools
+          cp build-projucer/extras/Projucer/Projucer_artefacts/Release/Projucer tools/
+
+      - name: Write the Android Studio project
+        run: |
+          python3 Android/make_jucer.py
+          xvfb-run -a tools/Projucer --resave Android/KeyCompassMobile.jucer
+          echo "sdk.dir=$ANDROID_HOME" > Android/Builds/Android/local.properties
+          sed -n '1,40p' Android/Builds/Android/app/src/main/AndroidManifest.xml
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            8
+            17
+
+      # The same key must sign every build, or Android refuses to install the update over the old app.
+      # It lives in the ANDROID_KEYSTORE_B64 secret (Settings > Secrets and variables > Actions).
+      - name: Signing key (from the secret)
+        id: secretkey
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          mkdir -p ~/.android
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > ~/.android/debug.keystore
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::The ANDROID_KEYSTORE_B64 secret is missing - using a temporary signing key kept in the build cache."
+          fi
+
+      - name: Temporary signing key (cached)
+        if: steps.secretkey.outputs.found != 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: temporary-signing-key-v1
+
+      - name: Make a temporary signing key
+        if: steps.secretkey.outputs.found != 'true'
+        run: |
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkeypair -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey \
+                    -keypass android -keyalg RSA -keysize 2048 -validity 20000 -storetype JKS -dname "CN=Key Compass (temporary)"
+          fi
+
+      - name: Build the app
+        working-directory: Android/Builds/Android
+        run: |
+          chmod +x gradlew
+          JAVA_HOME="$JAVA_HOME_17_X64" ./gradlew --no-daemon --stacktrace \
+              -Porg.gradle.java.installations.fromEnv=JAVA_HOME_8_X64,JAVA_HOME_17_X64 \
+              assembleRelease_Release
+          find app/build/outputs -name "*.apk" -print
+
+      - name: Collect the .apk
+        id: apk
+        run: |
+          apk=$(find Android/Builds/Android/app/build/outputs/apk -name "*.apk" | head -n 1)
+          version=$(grep -o 'KC_VERSION_STRING "[^"]*"' Source/Version.h | cut -d'"' -f2)
+          mkdir -p dist
+          cp "$apk" dist/KeyCompass.apk
+          ls -la dist
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KeyCompass-apk
+          path: dist/KeyCompass.apk
+          retention-days: 30
+
+      - name: Publish on the release page
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.apk.outputs.version }}
+        run: |
+          tag="android-latest"
+          notes="Key Compass ${VERSION} for Android phones and tablets (Android 8 or newer).
+          Built $(date -u '+%Y-%m-%d %H:%M UTC') from ${GITHUB_SHA::7}.
+
+          To install: open this page on your phone, tap KeyCompass.apk, then Open. The first time, Android asks you to
+          allow installs from your browser - allow it, then tap Install."
+          git tag -f "$tag" "$GITHUB_SHA"
+          git push -f origin "refs/tags/$tag"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release edit "$tag" --title "Key Compass ${VERSION} for Android" --notes "$notes" --latest
+          else
+            gh release create "$tag" --title "Key Compass ${VERSION} for Android" --notes "$notes" --latest
+          fi
+          gh release upload "$tag" dist/KeyCompass.apk --clobber

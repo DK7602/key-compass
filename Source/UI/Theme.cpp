@@ -17,6 +17,16 @@ namespace kcui
         plaque     = juce::ImageCache::getFromMemory (BinaryData::plaque_png, BinaryData::plaque_pngSize);
     }
 
+    bool& touchUIFlag() noexcept
+    {
+       #if JUCE_ANDROID || JUCE_IOS
+        static bool touch = true;
+       #else
+        static bool touch = false;
+       #endif
+        return touch;
+    }
+
     float textWidth (const juce::Font& font, const juce::String& text)
     {
         return juce::GlyphArrangement::getStringWidth (font, text);

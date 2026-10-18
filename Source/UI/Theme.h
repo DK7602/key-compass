@@ -87,4 +87,10 @@ namespace kcui
                           juce::Colour textColour, juce::Colour glowColour, int glowRadius, float glowStrength);
 
     float textWidth (const juce::Font& font, const juce::String& text);
+
+    // Touch screens (the Android app): no hover tooltips, press-and-hold instead of right-click,
+    // bigger menu rows. On by default on phones and tablets; the desktop tests can switch it on.
+    bool& touchUIFlag() noexcept;
+    inline bool isTouchUI() noexcept { return touchUIFlag(); }
+    inline int menuItemHeight() noexcept { return isTouchUI() ? 46 : 30; }
 }

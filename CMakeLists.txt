@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.22)
 
-project (KeyCompass VERSION 1.3.4 LANGUAGES C CXX)
+project (KeyCompass VERSION 1.4.0 LANGUAGES C CXX)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,7 +25,7 @@ option (KC_LINUX_TEST "Developer build for Linux without audio devices / X11 ext
 juce_add_plugin (KeyCompass
     COMPANY_NAME                "Key Compass"
     PRODUCT_NAME                "Key Compass"
-    VERSION                     1.3.4
+    VERSION                     1.4.0
     PLUGIN_MANUFACTURER_CODE    KcMp
     PLUGIN_CODE                 Kcmp
     FORMATS                     ${KC_FORMATS}
@@ -101,13 +101,24 @@ target_link_libraries (KeyCompass
         juce::juce_recommended_warning_flags)
 
 # ---------------------------------------------------------------------------------------------
-# Developer-only: renders the editor to PNG files with test audio (not needed to use the plug-in)
+# Developer-only (Linux): renders the screens to PNG files with test audio (not needed to use the plug-in)
 if (KC_LINUX_TEST)
-    juce_add_console_app (KeyCompassSnapshot PRODUCT_NAME "KeyCompassSnapshot")
-    target_sources (KeyCompassSnapshot PRIVATE Tests/SnapshotMain.cpp ${KC_SOURCES})
-    target_compile_definitions (KeyCompassSnapshot PRIVATE ${KC_DEFINITIONS}
-        JucePlugin_Name="Key Compass" JucePlugin_Build_Standalone=0 JUCE_STANDALONE_APPLICATION=1)
-    target_link_libraries (KeyCompassSnapshot PRIVATE
-        KeyCompassAssets juce::juce_audio_processors juce::juce_gui_extra juce::juce_audio_formats
+    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Tests/SnapshotMain.cpp")
+        juce_add_console_app (KeyCompassSnapshot PRODUCT_NAME "KeyCompassSnapshot")
+        target_sources (KeyCompassSnapshot PRIVATE Tests/SnapshotMain.cpp ${KC_SOURCES})
+        target_compile_definitions (KeyCompassSnapshot PRIVATE ${KC_DEFINITIONS}
+            JucePlugin_Name="Key Compass" JucePlugin_Build_Standalone=0 JUCE_STANDALONE_APPLICATION=1)
+        target_link_libraries (KeyCompassSnapshot PRIVATE
+            KeyCompassAssets juce::juce_audio_processors juce::juce_gui_extra juce::juce_audio_formats
+            juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
+    endif ()
+
+    # the Android app's screens, drawn at phone and tablet sizes (Tests/MobileShots.cpp)
+    juce_add_console_app (KeyCompassMobileShots PRODUCT_NAME "KeyCompassMobileShots")
+    target_sources (KeyCompassMobileShots PRIVATE Tests/MobileShots.cpp Source/Mobile/MobileEditor.cpp ${KC_SOURCES})
+    target_compile_definitions (KeyCompassMobileShots PRIVATE ${KC_DEFINITIONS}
+        KC_MOBILE=1 JucePlugin_Build_Standalone=0 JUCE_STANDALONE_APPLICATION=1 JUCE_MODAL_LOOPS_PERMITTED=1)
+    target_link_libraries (KeyCompassMobileShots PRIVATE
+        KeyCompassAssets juce::juce_audio_utils juce::juce_audio_processors juce::juce_gui_extra juce::juce_audio_formats
         juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
 endif ()

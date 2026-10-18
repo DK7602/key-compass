@@ -99,7 +99,7 @@ namespace kcui
             idealHeight = 10;
             return;
         }
-        idealHeight = jmax (30, standardMenuItemHeight);
+        idealHeight = jmax (menuItemHeight(), standardMenuItemHeight);
         idealWidth = (int) textWidth (assets.cinzel (18.5f), text) + 70;
     }
 
@@ -298,7 +298,7 @@ namespace kcui
         const auto screen = owner.getScreenBounds();
         menu.showMenuAsync (PopupMenu::Options().withTargetScreenArea (screen)
                                                 .withMinimumWidth (jmax (screen.getWidth(), 300))
-                                                .withStandardItemHeight (30),
+                                                .withStandardItemHeight (menuItemHeight()),
                             [safe = Component::SafePointer<Component> (&owner), chosen] (int result)
                             {
                                 if (safe != nullptr && result > 0)

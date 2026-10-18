@@ -1,6 +1,7 @@
 // Key Compass - the built-in manual (see Manual.h)
 #include "Manual.h"
 #include "BinaryData.h"
+#include "../Version.h"
 
 namespace kcui
 {
@@ -29,9 +30,17 @@ namespace kcui
         return file;
     }
 
+    std::function<bool (const juce::File&)>& manualOpener()
+    {
+        static std::function<bool (const juce::File&)> opener;
+        return opener;
+    }
+
     bool openManual()
     {
         const auto file = writeManualFile();
+        if (file.existsAsFile() && manualOpener())
+            return manualOpener() (file);
         if (! file.existsAsFile()) return false;
         if (file.startAsProcess()) return true;
         return juce::URL (file).launchInDefaultBrowser();
@@ -42,7 +51,7 @@ namespace kcui
        #if defined (JucePlugin_VersionString)
         const juce::String version (JucePlugin_VersionString);
        #else
-        const juce::String version ("dev");
+        const juce::String version (KC_VERSION_STRING);
        #endif
         return "Key Compass " + version + "  -  built " + juce::String (__DATE__).replace ("  ", " ");
     }
