@@ -138,6 +138,20 @@ shot 16-cloud 4
 tap_button "TURN ON SYNC" 208 421
 shot 17-cloud-on 12
 alive "turning on cloud sync"
+# leave nothing behind in the cloud: TURN OFF... > delete the songs in the cloud > Delete
+tap_button "TURN OFF…" 292 542
+sleep 2
+adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1
+del=$(adb shell cat /sdcard/ui.xml 2>/dev/null | tr '>' '\n' | grep -E "(text|content-desc)=\"Turn off and delete[^\"]*\"" | grep -o 'bounds="[^"]*"' | head -1)
+if [ -n "$del" ]; then
+    set -- $(echo "$del" | grep -o '[0-9]*'); adb shell input tap $(( ($1 + $3) / 2 )) $(( ($2 + $4) / 2 ))
+    sleep 2
+    tap_button "Delete" 140 520
+    shot 17b-cloud-off 8
+else
+    echo "couldn't find the delete choice (the test account stays in the cloud)" >> "$out/result.txt"
+    adb shell input keyevent KEYCODE_BACK
+fi
 adb shell input keyevent KEYCODE_BACK
 sleep 1
 adb shell input keyevent KEYCODE_BACK
