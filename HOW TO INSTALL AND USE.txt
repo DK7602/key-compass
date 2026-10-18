@@ -172,7 +172,9 @@ DRAG TO DAW     Drag the round DRAG SONG TO DAW porthole (top-right) onto a MIDI
                 drag its pill or the row's own arrow instead. Click the porthole to save
                 a .mid file.
 SONG menu       Undo / redo (also Ctrl+Z / Ctrl+Shift+Z), new song from a template,
-                rename the song (the name of the MIDI part), save a MIDI file.
+                rename the song (the name of the MIDI part), save a MIDI file, and
+                save / open a song file (.kcsong) to move the whole song to or from
+                the Android app (see KEY COMPASS ON ANDROID).
 BOTTOM PLATES   On this page the six controls at the bottom change job:
                   PLAY STYLE  how chords play, in the preview AND in the MIDI:
                               Block (held), Pulse (8ths), Strum (down-up), Arpeggio
@@ -198,8 +200,56 @@ audio interface input (sing or play into it). Click "Options" at the top of the
 window to choose the input device or a MIDI keyboard.
 
 
+KEY COMPASS ON ANDROID (phones and tablets)
+-------------------------------------------
+INSTALL: on the phone, open  https://github.com/DK7602/key-compass/releases/latest
+and tap KeyCompass.apk. When it has downloaded, tap Open. The first time, Android asks
+you to allow installs from your browser: allow it, then tap Install. (If Play Protect
+says it doesn't know the app: More details > Install anyway.) It needs Android 8 or newer.
+To update, install the newest KeyCompass.apk the same way: it replaces the old app and
+keeps your song.
+
+The first time it starts it asks for the microphone - that is how it listens. A USB or
+Bluetooth MIDI keyboard works too.
+
+A phone held upright has tabs along the bottom:
+  COMPASS   the compass, with MODE, LOCK KEY, FLATS and CLEAR under it
+  CHORDS    chord diagrams and the progression
+  SONG      the song's sections, with the bass and lead rows
+  LIBRARY   the progression browser
+  SETTINGS  tap tempo, capture chords, the SONG menu, play style, time signature,
+            octave, lock key, volume, sharing, the compass's response and tuning,
+            and the manual
+Turn it on its side and the tabs move down the left (the compass shows its lid and dial
+side by side). A tablet held upright shows the same layout as on the PC; on its side it
+shows all three Song Mapper panels at once.
+
+TOUCH
+  - A tap is a click. Press and hold is a right-click (the menus).
+  - Swipe to scroll the song and the library.
+  - Bass and lead rows: tap an empty spot to add a note, drag a note to move it, drag
+    its right end to change its length, double-tap to delete, press and hold for more.
+  - Undo and redo are the round arrows either side of KEY / TEMPO.
+  - There is no DAW to drag into, so the drag buttons share instead: tap a section's or
+    a row's arrow button, press and hold CHORDS / BASS / LEAD, or SETTINGS > SHARE MIDI.
+    Send the .mid to yourself (Drive, Gmail...) and drop it into Cubase on the PC.
+
+SONG FILES (phone <-> PC): SETTINGS > SHARE SONG FILE sends the whole song - sections,
+chords, bass and lead lines and settings - as a .kcsong file. On the PC open it with the
+SONG menu > Open a song file. The other way: SONG menu > Save song file on the PC, put it
+on Drive (or email it), then SETTINGS > OPEN SONG FILE on the phone. Undo brings back
+the song you had before.
+
+The app saves itself whenever you switch away from it. It keeps the screen on while
+it hears music, plays the song or shows the practice view.
+
+
 TROUBLESHOOTING
 ---------------
+- Android: the compass doesn't react - allow the microphone (tap the red note on the
+  compass, or Settings > Apps > Key Compass > Permissions > Microphone > Allow).
+- Android: "App not installed" when updating - the new app was signed differently from
+  the one on the phone. Uninstall Key Compass (share your song file first), then install.
 - The build failed: open build-log.txt in this folder; the error is near the bottom.
 - "Could not copy the plug-in": close Cubase and run Build and Install.bat again.
 - Song Mapper bass or lead sounds out of tune against the chords: the KEY at the top

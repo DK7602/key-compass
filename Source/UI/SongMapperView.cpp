@@ -410,6 +410,7 @@ namespace kcui
         // Each row has its own column cuts (the scroll rollers at the top, the ornaments at the bottom).
         Graphics::ScopedSaveState save (g);
         g.setImageResamplingQuality (Graphics::highResamplingQuality);
+        g.setOpacity (1.0f);
         constexpr float k = 1.0f / 1.5f;                                  // art pixels -> design pixels
         const float iw = (float) img.getWidth(), ih = (float) img.getHeight();
         const float rows[4] = { 0.0f, 62.0f, ih - 120.0f, ih };
@@ -841,7 +842,7 @@ namespace kcui
     class TrayGrid : public Component, public DragAndDropTarget
     {
     public:
-        explicit TrayGrid (SongMapperPage& p) : page (p) {}
+        explicit TrayGrid (SongMapperPage& p) : page (p) { setComponentID ("trayGrid"); }
 
         static constexpr int cols = 4, rows = 2, slots = cols * rows;
 
@@ -1501,6 +1502,7 @@ namespace kcui
             : page (p), section (sectionIndex), lane (l), loopBox (p.assets), fillBox (p.assets),
               removeBtn (p.assets, String (CharPointer_UTF8 ("\xc3\x97")), KButton::Look::Round)
         {
+            setComponentID ("lane" + String (sectionIndex) + (l == sm::Lane::Bass ? "bass" : "lead"));
             addAndMakeVisible (loopBox);
             if (lane == sm::Lane::Bass) addAndMakeVisible (fillBox);
             addAndMakeVisible (dawBtn);
@@ -2270,6 +2272,7 @@ namespace kcui
               removeBtn (p.assets, String (CharPointer_UTF8 ("\xc3\x97")), KButton::Look::Round),
               addBass (p.assets, "+  bass line"), addLead (p.assets, "+  lead line")
         {
+            setComponentID ("section" + String (idx));
             for (Component* c : { (Component*) &bars, (Component*) &perChord, (Component*) &playBtn, (Component*) &dawBtn, (Component*) &removeBtn })
                 addAndMakeVisible (c);
             addChildComponent (addBass);
@@ -3078,6 +3081,7 @@ namespace kcui
               chordsPill (p, sm::Lane::Chords), bassPill (p, sm::Lane::Bass), leadPill (p, sm::Lane::Lead)
         {
             viewport.setViewedComponent (&list, false);
+            viewport.setComponentID ("timelineViewport");
             viewport.setScrollBarsShown (true, false);
             viewport.setScrollBarThickness (10);
             viewport.setScrollOnDragMode (isTouchUI() ? Viewport::ScrollOnDragMode::all : Viewport::ScrollOnDragMode::nonHover);
@@ -3486,8 +3490,9 @@ namespace kcui
 
             g.setColour (Palette::ink);
             g.setFont (page.assets.cinzel (20.0f * k));
-            g.drawText ("DRAG SONG", Rectangle<float> (c.x - r2, c.y - 2.0f * k, 2 * r2, 22.0f * k), Justification::centred, false);
-            g.drawText ("TO DAW", Rectangle<float> (c.x - r2, c.y + 19.0f * k, 2 * r2, 22.0f * k), Justification::centred, false);
+            // a touch screen has no DAW to drag into: tapping shares the MIDI instead
+            g.drawText (isTouchUI() ? "SHARE SONG" : "DRAG SONG", Rectangle<float> (c.x - r2, c.y - 2.0f * k, 2 * r2, 22.0f * k), Justification::centred, false);
+            g.drawText (isTouchUI() ? "AS MIDI" : "TO DAW", Rectangle<float> (c.x - r2, c.y + 19.0f * k, 2 * r2, 22.0f * k), Justification::centred, false);
             g.setColour (Palette::inkSoft);
             g.setFont (page.assets.baskItalic (17.0f * k));
             const int bars = page.song.totalBars();
@@ -3996,7 +4001,8 @@ namespace kcui
             String hint = isTouchUI() ? "Tap a chord, a dot or a key to hear it" : "Click a chord, or one dot or key, to hear it";
             if (canReorder()) hint += dot + (isTouchUI() ? "drag a card to move it" : "drag a card to move it");
             if (! isTouchUI()) hint += dot + String (CharPointer_UTF8 ("+ / \xe2\x88\x92 size")) + dot + "Esc closes";
-            g.drawFittedText (hint, hintArea, narrow ? Justification::centred : Justification::centredLeft, narrow ? 4 : 2, 0.8f);
+            if (hintArea.getHeight() >= 30)
+                g.drawFittedText (hint, hintArea, narrow ? Justification::centred : Justification::centredLeft, narrow ? 4 : 2, 0.8f);
             g.setColour (panelInk);
             g.setFont (page.assets.cinzel (18.0f));
             g.drawText ("SIZE", sizeLabel.toFloat(), Justification::centred, false);

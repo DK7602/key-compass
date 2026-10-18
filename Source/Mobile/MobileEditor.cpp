@@ -780,7 +780,28 @@ void MobileEditor::resized()
     for (auto* c : practiceLayer.getChildren())
         c->setBounds (practiceLayer.getLocalBounds());
     practiceLayer.toFront (false);
+    keepTypingVisible (keyboard);
     repaint();
+}
+
+void MobileEditor::keepTypingVisible (int keyboard)
+{
+    // The on-screen keyboard covers the bottom of the screen. If you're typing into something it would hide
+    // (a chord name, a section name), slide the Song Mapper up so the text stays in view.
+    Component* moved = layout == Layout::Classic ? (Component*) &canvas : (Component*) &canvas.mapper;
+    const auto base = layout == Layout::Classic ? canvasTransform : AffineTransform();
+    int shift = 0;
+    if (keyboard > 0)
+        if (auto* focused = Component::getCurrentlyFocusedComponent())
+            if (dynamic_cast<TextEditor*> (focused) != nullptr && moved->isParentOf (focused))
+            {
+                moved->setTransform (base);
+                const auto r = getLocalArea (focused, focused->getLocalBounds());
+                const int visibleBottom = getHeight() - keyboard - 10;
+                if (r.getBottom() > visibleBottom)
+                    shift = jmin (r.getBottom() - visibleBottom, jmax (0, r.getY() - 40));
+            }
+    moved->setTransform (base.translated (0.0f, (float) -shift));
 }
 
 void MobileEditor::layoutClassic (Rectangle<int> area)
@@ -798,7 +819,8 @@ void MobileEditor::layoutClassic (Rectangle<int> area)
                           (float) area.getHeight() / (float) kcui::Layout::designHeight);
     const float x = (float) area.getX() + ((float) area.getWidth() - (float) kcui::Layout::designWidth * s) * 0.5f;
     const float y = (float) area.getY() + ((float) area.getHeight() - (float) kcui::Layout::designHeight * s) * 0.5f;
-    canvas.setTransform (AffineTransform::scale (s).translated (x, y));
+    canvasTransform = AffineTransform::scale (s).translated (x, y);
+    canvas.setTransform (canvasTransform);
     const int page = (tab == compassTab || tab == moreTab) ? 0 : 1;
     canvas.showPage (page);
     processor.setEditorPage (page);
@@ -941,6 +963,18 @@ void MobileEditor::timerCallback()
     const auto area = safeArea (&kb);
     if (area != lastSafe || kb != lastKeyboard)
         resized();
+    // keep the screen on while you play along (Android lets it sleep otherwise)
+    // keep the screen on while you're playing along: music heard in the last two minutes, the song playing,
+    // or the practice view open (Android would otherwise dim it mid-song)
+    const double now = Time::getMillisecondCounterHiRes();
+    if (processor.getEngine().getSnapshot().signalPresent || processor.getAudition().isSequencePlaying() || canvas.mapper.isPracticeOpen())
+        lastActivityMs = now;
+    const bool awake = isShowing() && now - lastActivityMs < 120000.0;
+    if (awake != keepingAwake)
+    {
+        keepingAwake = awake;
+        Desktop::getInstance().setScreenSaverEnabled (! keepingAwake);
+    }
 }
 
 void MobileEditor::tick (float seconds)

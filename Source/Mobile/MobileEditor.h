@@ -54,6 +54,7 @@ private:
     void layoutClassic (juce::Rectangle<int> area);
     void layoutTouch (juce::Rectangle<int> area, bool sideways);
     void putMapperInCanvas (bool inCanvas);
+    void keepTypingVisible (int keyboardHeight);
     int effectiveTab() const;                     // the tab as the current layout shows it
 
     KeyCompassProcessor& processor;
@@ -72,10 +73,12 @@ private:
 
     Layout layout = Layout::Phone;
     int tab = compassTab, panes = 1;
-    bool mapperInCanvas = true, micAllowed = true;
+    bool mapperInCanvas = true, micAllowed = true, keepingAwake = false;
     bool lastFlats = false, lastLock = false;
     int lastMode = -1, lastKeyboard = -1;
     juce::Rectangle<int> lastSafe;
+    juce::AffineTransform canvasTransform;
+    double lastActivityMs = 0.0;
     juce::BorderSize<int> simulatedSafe;
     int simulatedKeyboard = 0;
     bool simulating = false;

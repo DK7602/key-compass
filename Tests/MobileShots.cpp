@@ -94,6 +94,14 @@ namespace
         }
     };
 
+    TextEditor* findTextEditor (Component& root)
+    {
+        if (auto* t = dynamic_cast<TextEditor*> (&root)) return root.isShowing() ? t : nullptr;
+        for (auto* c : root.getChildren())
+            if (auto* t = findTextEditor (*c)) return t;
+        return nullptr;
+    }
+
     void pump (int ms)
     {
         MessageManager::getInstance()->runDispatchLoopUntil (ms);
@@ -126,6 +134,175 @@ namespace
     }
 }
 
+//==============================================================================
+// Touch checks: finger-like events through the window (Linux has no touch source, so the mouse stands in;
+// the app behaves as on a touch screen because the touch switch is on), then look at the song
+namespace
+{
+    Component* findID (Component& root, const String& id)
+    {
+        if (root.getComponentID() == id) return &root;
+        for (auto* c : root.getChildren())
+            if (auto* f = findID (*c, id)) return f;
+        return nullptr;
+    }
+
+    struct Finger
+    {
+        ComponentPeer& peer;
+        Point<float> at;
+        void send (Point<float> p, bool down)
+        {
+            at = p;
+            const auto mods = down ? ModifierKeys::currentModifiers.withFlags (ModifierKeys::leftButtonModifier)
+                                   : ModifierKeys::currentModifiers.withoutMouseButtons();
+            peer.handleMouseEvent (MouseInputSource::InputSourceType::mouse, p, mods, 1.0f, 0.0f, Time::currentTimeMillis());
+        }
+        void down (Point<float> p) { send (p, true); pump (30); }
+        void move (Point<float> p, int steps = 8)
+        {
+            const auto from = at;
+            for (int i = 1; i <= steps; ++i) { send (from + (p - from) * ((float) i / (float) steps), true); pump (16); }
+        }
+        void up() { send (at, false); pump (80); }
+        void tap (Point<float> p) { down (p); up(); }
+        void hold (Point<float> p, int ms = 700) { down (p); pump (ms); up(); }
+    };
+
+    // a point of a component, in the editor's (= the window's) coordinates
+    Point<float> pointIn (Component& root, Component& c, float fx, float fy)
+    {
+        const auto local = Point<float> ((float) c.getWidth() * fx, (float) c.getHeight() * fy);
+        return root.getLocalPoint (&c, local);
+    }
+
+    int runChecks (KeyCompassProcessor& proc)
+    {
+        int failed = 0;
+        auto check = [&failed] (bool ok, const String& what)
+        {
+            std::cout << (ok ? "  ok   " : "  FAIL ") << what << std::endl;
+            if (! ok) ++failed;
+        };
+        auto& song = proc.getSongMap();
+        proc.setMobileTab (MobileEditor::chordsTab);
+        MobileEditor ed (proc);
+        ed.setSimulatedInsets ({ 36, 0, 24, 0 });
+        ed.setBounds (0, 0, 412, 915);
+        ed.addToDesktop (ComponentPeer::windowIgnoresKeyPresses);
+        ed.setVisible (true);
+        pump (300);
+        auto* peer = ed.getPeer();
+        if (peer == nullptr) { std::cout << "no window" << std::endl; return 1; }
+        Finger f { *peer, {} };
+        struct Spy : MouseListener
+        {
+            void mouseDown (const MouseEvent& e) override { if (verbose) std::cout << "    down on " << typeid (*e.eventComponent).name() << " " << e.getPosition().toString() << std::endl; }
+            void mouseUp (const MouseEvent& e) override   { if (verbose) std::cout << "    up on " << typeid (*e.eventComponent).name() << std::endl; }
+            bool verbose = SystemStats::getEnvironmentVariable ("KC_SPY", {}).isNotEmpty();
+        } spy;
+        ed.addMouseListener (&spy, true);
+        std::cout << "  window at " << ed.getScreenBounds().toString() << ", showing " << (int) ed.isShowing() << std::endl;
+
+        // --- the chords tab: tap a progression card, press and hold for its menu
+        auto* grid = findID (ed, "trayGrid");
+        check (grid != nullptr && grid->isShowing(), "chords tab shows the progression cards");
+        if (grid != nullptr)
+        {
+            song.selectedTray = 0;
+            f.tap (pointIn (ed, *grid, 0.375f, 0.25f));       // the second card (D)
+            check (song.selectedTray == 1 && ed.getMapper().focused.id() == std::string ("D"), "a tap picks the D card");
+            f.hold (pointIn (ed, *grid, 0.125f, 0.25f));
+            check (PopupMenu::dismissAllActiveMenus(), "press and hold opens the card's menu");
+            pump (100);
+        }
+
+        // --- the tabs
+        ed.showTab (MobileEditor::songTab);
+        pump (200);
+        const auto tabY = 915.0f - 24.0f - 30.0f;
+        f.tap ({ 412.0f * 0.7f, tabY });         // LIBRARY is the fourth of five
+        check (ed.currentTab() == MobileEditor::libraryTab, "tapping LIBRARY in the tab bar");
+        f.tap ({ 412.0f * 0.5f, tabY });
+        check (ed.currentTab() == MobileEditor::songTab, "tapping SONG in the tab bar");
+        pump (200);
+
+        // --- the song tab: tap the bass roll to add a note, swipe it to scroll
+        ed.getMapper().showSection (1);
+        pump (200);
+        auto* lane = findID (ed, "lane1bass");
+        auto* vp = dynamic_cast<Viewport*> (findID (ed, "timelineViewport"));
+        check (lane != nullptr && lane->isShowing() && vp != nullptr, "the verse's bass row is on screen");
+        if (lane != nullptr && vp != nullptr)
+        {
+            const auto before = song.line (1, sm::Lane::Bass).notes.size();
+            // near the top of the roll (high notes the fill doesn't use), early in the bar
+            f.tap (pointIn (ed, *lane, 0.30f, 0.27f));
+            check (song.line (1, sm::Lane::Bass).notes.size() == before + 1, "a tap on the roll adds a bass note");
+            song.undo();
+            pump (100);
+            const auto startY = vp->getViewPositionY();
+            auto* lane2 = findID (ed, "lane1bass");
+            f.down (pointIn (ed, *lane2, 0.62f, 0.30f));
+            f.move (f.at.translated (0.0f, -160.0f));
+            f.up();
+            pump (400);
+            check (vp->getViewPositionY() > startY + 60, "a swipe up on the roll scrolls the song (" + String (startY) + " -> " + String (vp->getViewPositionY()) + ")");
+            check (song.line (1, sm::Lane::Bass).notes.size() == before, "and adds no note");
+        }
+
+        // --- a chip in a section: tap shows the chord, press and hold for its menu
+        pump (1500);                         // let the swipe's glide come to rest
+        ed.getMapper().showSection (0);
+        pump (200);
+        if (auto* row = findID (ed, "section0"))
+        {
+            // the chips start under the 86 px header: F#m, G#dim, A, E
+            const float sx = (float) row->getWidth(), sy = (float) row->getHeight();
+            f.tap (ed.getLocalPoint (row, Point<float> (8.0f + 66.0f + 6.0f + 33.0f, 86.0f + 8.0f + 20.0f)));
+            check (ed.getMapper().focused.id() == std::string ("G#dim"), "a tap on the G#dim chip shows it");
+            f.hold (ed.getLocalPoint (row, Point<float> (8.0f + 33.0f, 86.0f + 8.0f + 20.0f)));
+            check (PopupMenu::dismissAllActiveMenus(), "press and hold on a chip opens its menu");
+            ignoreUnused (sx, sy);
+            pump (100);
+        }
+        else check (false, "the intro's row");
+
+        // --- practice view and the back button
+        ed.getMapper().showPractice (-2);
+        pump (200);
+        check (ed.getMapper().isPracticeOpen(), "practice view opens");
+        check (ed.handleBackButton() && ! ed.getMapper().isPracticeOpen(), "the back button closes it");
+        pump (100);
+        check (ed.handleBackButton() && ed.currentTab() == MobileEditor::compassTab, "back again goes to the compass");
+        check (! ed.handleBackButton(), "back on the compass leaves the app");
+
+        // --- song files
+        const auto xml = ed.getMapper().songFileXml();
+        song.clearAllChords();
+        check (ed.getMapper().loadSongXml (xml) && song.sections.size() == 4 && song.sections[1].chords.size() == 8, "a song file loads back");
+        check (! ed.getMapper().loadSongXml ("<html/>"), "something else is refused");
+        song.undo();
+        pump (100);
+        song.redo();
+
+        // --- rotate: a phone on its side, a tablet
+        ed.setBounds (0, 0, 915, 412);
+        pump (100);
+        check (ed.currentLayout() == MobileEditor::Layout::Wide, "on its side: tabs down the left");
+        ed.setBounds (0, 0, 800, 1280);
+        pump (100);
+        check (ed.currentLayout() == MobileEditor::Layout::Classic, "an upright tablet: the desktop pages");
+        ed.setBounds (0, 0, 1280, 800);
+        pump (100);
+        check (ed.currentLayout() == MobileEditor::Layout::Wide && ed.panelsSideBySide() == 3, "a tablet on its side: three panels");
+        ed.removeMouseListener (&spy);
+        ed.removeFromDesktop();
+        std::cout << (failed == 0 ? "all touch checks passed" : String (failed) + " touch checks FAILED") << std::endl;
+        return failed;
+    }
+}
+
 int main (int argc, char* argv[])
 {
     ScopedJuceInitialiser_GUI juceInit;
@@ -139,6 +316,8 @@ int main (int argc, char* argv[])
     AudioProcessor::setTypeOfNextNewPlugin (AudioProcessor::wrapperType_Undefined);
     feedTestAudio (proc);
     makeSong (proc);
+    if (filter == "checks")
+        return runChecks (proc);
 
     struct Shot
     {
@@ -160,6 +339,15 @@ int main (int argc, char* argv[])
         { "phone_practice",  412, 915, phoneBars, T::chordsTab, [] (MobileEditor& e) { e.getMapper().showPractice (-2); } },
         { "phone_piano",     412, 915, phoneBars, T::chordsTab, [&proc] (MobileEditor&) { proc.getSongMap().guitar = false; proc.getSongMap().changed(); } },
         { "phone_manual",    412, 915, phoneBars, T::moreTab, [] (MobileEditor& e) { e.showManualWith (std::make_unique<FakePdf>()); pump (600); } },
+        { "phone_typing",    412, 915, phoneBars, T::chordsTab, [] (MobileEditor& e)
+            {
+                e.addToDesktop (0);
+                e.setVisible (true);
+                pump (200);
+                if (auto* ed = findTextEditor (e)) ed->grabKeyboardFocus();
+                e.setSimulatedInsets ({ 36, 0, 24, 0 }, 320);
+                pump (100);
+            } },
         { "side_compass",    915, 412, sideBars, T::compassTab, [&proc] (MobileEditor&) { proc.getSongMap().guitar = true; proc.getSongMap().changed(); } },
         { "side_chords",     915, 412, sideBars, T::chordsTab, {} },
         { "side_song",       915, 412, sideBars, T::songTab, {} },

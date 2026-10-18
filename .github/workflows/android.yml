@@ -176,3 +176,47 @@ jobs:
             gh release create "$tag" --title "Key Compass ${VERSION} for Android" --notes "$notes" --latest
           fi
           gh release upload "$tag" dist/KeyCompass.apk --clobber
+
+  # Installs the new app on an Android emulator, opens it, taps through the tabs and keeps screenshots and
+  # the system log (on the ci-logs branch), so a crash shows up here before it reaches a phone.
+  emulator-test:
+    needs: apk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: KeyCompass-apk
+
+      - name: Let the emulator use the processor's virtualisation
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run the app on a Pixel-sized emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-boot-anim -camera-back none -noaudio
+          script: bash Scripts/android-smoke-test.sh KeyCompass.apk smoke
+
+      - name: Keep the screenshots and the log
+        if: always()
+        run: |
+          mkdir -p /tmp/smoke && cp -r smoke/. /tmp/smoke/ 2>/dev/null || true
+          git config user.name "Android build"
+          git config user.email "actions@users.noreply.github.com"
+          git fetch -q origin ci-logs || true
+          git checkout -q --orphan ci-smoke
+          git rm -rfq --cached .
+          mkdir -p ci-smoke && cp -r /tmp/smoke/. ci-smoke/ 2>/dev/null || true
+          git add -f ci-smoke
+          git commit -qm "Emulator test for ${GITHUB_SHA::7}" || true
+          git push -qf origin HEAD:refs/heads/ci-smoke

@@ -52,6 +52,7 @@ public:
     {
         saveState();
         stopAudio();
+        juce::Desktop::getInstance().setScreenSaverEnabled (true);
     }
 
     void resumed() override

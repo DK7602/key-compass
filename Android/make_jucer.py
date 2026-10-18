@@ -54,7 +54,8 @@ w(f'    <ANDROIDSTUDIO targetFolder="Builds/Android" androidMinimumSDK="26" andr
   '                   microphonePermissionNeeded="1" androidEnableContentSharing="1" androidPushNotifications="0"\n'
   '                   androidExternalReadNeeded="0" androidExternalWriteNeeded="0" androidReadMediaAudioPermission="0"\n'
   '                   androidReadMediaImagesPermission="0" androidReadMediaVideoPermission="0"\n'
-  '                   androidBluetoothNeeded="0" androidInternetNeeded="0" bigIcon="KcIcon" smallIcon="KcIcon">\n')
+  '                   androidBluetoothNeeded="0" androidInternetNeeded="0" bigIcon="KcIcon" smallIcon="KcIcon"\n'
+  '                   androidTheme="@android:style/Theme.DeviceDefault.NoActionBar">\n')
 w('      <CONFIGURATIONS>\n')
 w('        <CONFIGURATION isDebug="1" name="Debug" androidArchitectures="arm64-v8a" recommendedWarnings="LLVM"/>\n')
 w('        <CONFIGURATION isDebug="0" name="Release" androidArchitectures="armeabi-v7a arm64-v8a" optimisation="3" recommendedWarnings="LLVM"/>\n')

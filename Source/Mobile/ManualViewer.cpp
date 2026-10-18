@@ -83,8 +83,8 @@ namespace
         ~AndroidPdf() override
         {
             auto* env = getEnv();
-            if (pdf != nullptr)        { env->CallVoidMethod (pdf.get(), KcPdfRenderer.close); javaFailed (env); }
-            if (descriptor != nullptr) { env->CallVoidMethod (descriptor.get(), KcParcelFd.close); javaFailed (env); }
+            if (pdf.get() != nullptr)        { env->CallVoidMethod (pdf.get(), KcPdfRenderer.close); javaFailed (env); }
+            if (descriptor.get() != nullptr) { env->CallVoidMethod (descriptor.get(), KcParcelFd.close); javaFailed (env); }
         }
 
         int pageCount() override               { return (int) sizes.size(); }
@@ -222,7 +222,10 @@ public:
             g.setColour (Colours::black.withAlpha (0.5f));
             g.fillRect (r.translated (2, 3));
             if (images[(size_t) i].isValid())
+            {
+                g.setOpacity (1.0f);
                 g.drawImage (images[(size_t) i], r.toFloat());
+            }
             else
             {
                 g.setColour (Colours::white);

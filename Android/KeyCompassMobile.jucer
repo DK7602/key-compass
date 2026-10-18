@@ -1,57 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<JUCERPROJECT id="KcMob1" name="Key Compass" projectType="guiapp" version="1.4.0"
-              bundleIdentifier="com.keycompass.app" companyName="Key Compass"
-              cppLanguageStandard="17" jucerFormatVersion="1" defines="KC_MOBILE=1"
-              addUsingNamespaceToJuceHeader="0" useAppConfig="0" maxBinaryFileSize="4194304">
+<!-- Key Compass for Android - written by Android/make_jucer.py (edit that, not this). The GitHub workflow
+     re-saves it with the Projucer into Android/Builds/Android and builds it with Gradle. JUCE goes in ../JUCE. -->
+<JUCERPROJECT id="KcMob1" name="Key Compass" projectType="guiapp" version="1.4.0" bundleIdentifier="com.keycompass.app"
+              companyName="Key Compass" cppLanguageStandard="17" jucerFormatVersion="1"
+              defines="KC_MOBILE=1" addUsingNamespaceToJuceHeader="0" useAppConfig="0" maxBinaryFileSize="4194304">
   <MAINGROUP id="KcMain" name="Key Compass">
     <GROUP id="KcSrc" name="Source">
       <FILE id="Ksrc000" name="KeyEngine.cpp" compile="1" resource="0" file="../Source/Engine/KeyEngine.cpp"/>
       <FILE id="Ksrc001" name="KeyEngine.h" compile="0" resource="0" file="../Source/Engine/KeyEngine.h"/>
       <FILE id="Ksrc002" name="LockFree.h" compile="0" resource="0" file="../Source/Engine/LockFree.h"/>
-      <FILE id="Ksrc003" name="MusicTheory.cpp" compile="1" resource="0"
-            file="../Source/Engine/MusicTheory.cpp"/>
+      <FILE id="Ksrc003" name="MusicTheory.cpp" compile="1" resource="0" file="../Source/Engine/MusicTheory.cpp"/>
       <FILE id="Ksrc004" name="MusicTheory.h" compile="0" resource="0" file="../Source/Engine/MusicTheory.h"/>
-      <FILE id="Ksrc005" name="ManualViewer.cpp" compile="1" resource="0"
-            file="../Source/Mobile/ManualViewer.cpp"/>
+      <FILE id="Ksrc005" name="ManualViewer.cpp" compile="1" resource="0" file="../Source/Mobile/ManualViewer.cpp"/>
       <FILE id="Ksrc006" name="ManualViewer.h" compile="0" resource="0" file="../Source/Mobile/ManualViewer.h"/>
       <FILE id="Ksrc007" name="MobileApp.cpp" compile="1" resource="0" file="../Source/Mobile/MobileApp.cpp"/>
-      <FILE id="Ksrc008" name="MobileEditor.cpp" compile="1" resource="0"
-            file="../Source/Mobile/MobileEditor.cpp"/>
+      <FILE id="Ksrc008" name="MobileEditor.cpp" compile="1" resource="0" file="../Source/Mobile/MobileEditor.cpp"/>
       <FILE id="Ksrc009" name="MobileEditor.h" compile="0" resource="0" file="../Source/Mobile/MobileEditor.h"/>
-      <FILE id="Ksrc010" name="PluginEditor.cpp" compile="1" resource="0"
-            file="../Source/PluginEditor.cpp"/>
+      <FILE id="Ksrc010" name="PluginEditor.cpp" compile="1" resource="0" file="../Source/PluginEditor.cpp"/>
       <FILE id="Ksrc011" name="PluginEditor.h" compile="0" resource="0" file="../Source/PluginEditor.h"/>
-      <FILE id="Ksrc012" name="PluginProcessor.cpp" compile="1" resource="0"
-            file="../Source/PluginProcessor.cpp"/>
-      <FILE id="Ksrc013" name="PluginProcessor.h" compile="0" resource="0"
-            file="../Source/PluginProcessor.h"/>
+      <FILE id="Ksrc012" name="PluginProcessor.cpp" compile="1" resource="0" file="../Source/PluginProcessor.cpp"/>
+      <FILE id="Ksrc013" name="PluginProcessor.h" compile="0" resource="0" file="../Source/PluginProcessor.h"/>
       <FILE id="Ksrc014" name="Audition.cpp" compile="1" resource="0" file="../Source/SongMapper/Audition.cpp"/>
       <FILE id="Ksrc015" name="Audition.h" compile="0" resource="0" file="../Source/SongMapper/Audition.h"/>
-      <FILE id="Ksrc016" name="ChordTheory.cpp" compile="1" resource="0"
-            file="../Source/SongMapper/ChordTheory.cpp"/>
+      <FILE id="Ksrc016" name="ChordTheory.cpp" compile="1" resource="0" file="../Source/SongMapper/ChordTheory.cpp"/>
       <FILE id="Ksrc017" name="ChordTheory.h" compile="0" resource="0" file="../Source/SongMapper/ChordTheory.h"/>
-      <FILE id="Ksrc018" name="ProgressionLibrary.cpp" compile="1" resource="0"
-            file="../Source/SongMapper/ProgressionLibrary.cpp"/>
-      <FILE id="Ksrc019" name="ProgressionLibrary.h" compile="0" resource="0"
-            file="../Source/SongMapper/ProgressionLibrary.h"/>
-      <FILE id="Ksrc020" name="SampleLibrary.cpp" compile="1" resource="0"
-            file="../Source/SongMapper/SampleLibrary.cpp"/>
-      <FILE id="Ksrc021" name="SampleLibrary.h" compile="0" resource="0"
-            file="../Source/SongMapper/SampleLibrary.h"/>
+      <FILE id="Ksrc018" name="ProgressionLibrary.cpp" compile="1" resource="0" file="../Source/SongMapper/ProgressionLibrary.cpp"/>
+      <FILE id="Ksrc019" name="ProgressionLibrary.h" compile="0" resource="0" file="../Source/SongMapper/ProgressionLibrary.h"/>
+      <FILE id="Ksrc020" name="SampleLibrary.cpp" compile="1" resource="0" file="../Source/SongMapper/SampleLibrary.cpp"/>
+      <FILE id="Ksrc021" name="SampleLibrary.h" compile="0" resource="0" file="../Source/SongMapper/SampleLibrary.h"/>
       <FILE id="Ksrc022" name="SongModel.cpp" compile="1" resource="0" file="../Source/SongMapper/SongModel.cpp"/>
       <FILE id="Ksrc023" name="SongModel.h" compile="0" resource="0" file="../Source/SongMapper/SongModel.h"/>
-      <FILE id="Ksrc024" name="CompassViews.cpp" compile="1" resource="0"
-            file="../Source/UI/CompassViews.cpp"/>
+      <FILE id="Ksrc024" name="CompassViews.cpp" compile="1" resource="0" file="../Source/UI/CompassViews.cpp"/>
       <FILE id="Ksrc025" name="CompassViews.h" compile="0" resource="0" file="../Source/UI/CompassViews.h"/>
       <FILE id="Ksrc026" name="Controls.cpp" compile="1" resource="0" file="../Source/UI/Controls.cpp"/>
       <FILE id="Ksrc027" name="Controls.h" compile="0" resource="0" file="../Source/UI/Controls.h"/>
       <FILE id="Ksrc028" name="Manual.cpp" compile="1" resource="0" file="../Source/UI/Manual.cpp"/>
       <FILE id="Ksrc029" name="Manual.h" compile="0" resource="0" file="../Source/UI/Manual.h"/>
-      <FILE id="Ksrc030" name="SongMapperView.cpp" compile="1" resource="0"
-            file="../Source/UI/SongMapperView.cpp"/>
-      <FILE id="Ksrc031" name="SongMapperView.h" compile="0" resource="0"
-            file="../Source/UI/SongMapperView.h"/>
+      <FILE id="Ksrc030" name="SongMapperView.cpp" compile="1" resource="0" file="../Source/UI/SongMapperView.cpp"/>
+      <FILE id="Ksrc031" name="SongMapperView.h" compile="0" resource="0" file="../Source/UI/SongMapperView.h"/>
       <FILE id="Ksrc032" name="Theme.cpp" compile="1" resource="0" file="../Source/UI/Theme.cpp"/>
       <FILE id="Ksrc033" name="Theme.h" compile="0" resource="0" file="../Source/UI/Theme.h"/>
       <FILE id="Ksrc034" name="UiState.h" compile="0" resource="0" file="../Source/UI/UiState.h"/>
@@ -63,14 +49,10 @@
       <FILE id="Kres002" name="mapper_bg.jpg" compile="0" resource="1" file="../Resources/mapper_bg.jpg"/>
       <FILE id="Kres003" name="plaque.png" compile="0" resource="1" file="../Resources/plaque.png"/>
       <FILE id="Kres004" name="CinzelBold.ttf" compile="0" resource="1" file="../Resources/fonts/CinzelBold.ttf"/>
-      <FILE id="Kres005" name="BaskervilleBold.ttf" compile="0" resource="1"
-            file="../Resources/fonts/BaskervilleBold.ttf"/>
-      <FILE id="Kres006" name="BaskervilleBoldItalic.ttf" compile="0" resource="1"
-            file="../Resources/fonts/BaskervilleBoldItalic.ttf"/>
-      <FILE id="Kres007" name="BaskervilleRegular.ttf" compile="0" resource="1"
-            file="../Resources/fonts/BaskervilleRegular.ttf"/>
-      <FILE id="Kres008" name="KeyCompassManual.pdf" compile="0" resource="1"
-            file="../Resources/manual/KeyCompassManual.pdf"/>
+      <FILE id="Kres005" name="BaskervilleBold.ttf" compile="0" resource="1" file="../Resources/fonts/BaskervilleBold.ttf"/>
+      <FILE id="Kres006" name="BaskervilleBoldItalic.ttf" compile="0" resource="1" file="../Resources/fonts/BaskervilleBoldItalic.ttf"/>
+      <FILE id="Kres007" name="BaskervilleRegular.ttf" compile="0" resource="1" file="../Resources/fonts/BaskervilleRegular.ttf"/>
+      <FILE id="Kres008" name="KeyCompassManual.pdf" compile="0" resource="1" file="../Resources/manual/KeyCompassManual.pdf"/>
       <FILE id="Kres009" name="samples.txt" compile="0" resource="1" file="../Resources/samples/samples.txt"/>
       <FILE id="Kres010" name="bass_25.ogg" compile="0" resource="1" file="../Resources/samples/bass_25.ogg"/>
       <FILE id="Kres011" name="bass_28.ogg" compile="0" resource="1" file="../Resources/samples/bass_28.ogg"/>
@@ -128,20 +110,17 @@
       <FILE id="Kres063" name="gtr_74.ogg" compile="0" resource="1" file="../Resources/samples/gtr_74.ogg"/>
       <FILE id="Kres064" name="map.jpg" compile="0" resource="1" file="../Resources/mobile/map.jpg"/>
       <FILE id="Kres065" name="panel.jpg" compile="0" resource="1" file="../Resources/mobile/panel.jpg"/>
-      <FILE id="KcIcon" name="KeyCompassIcon.png" compile="0" resource="0"
-            file="../Resources/KeyCompassIcon.png"/>
+      <FILE id="KcIcon" name="KeyCompassIcon.png" compile="0" resource="0" file="../Resources/KeyCompassIcon.png"/>
     </GROUP>
   </MAINGROUP>
-  <JUCEOPTIONS JUCE_WEB_BROWSER="0" JUCE_USE_CURL="0" JUCE_STRICT_REFCOUNTEDPOINTER="1"
-               JUCE_USE_ANDROID_OBOE="1" JUCE_USE_OGGVORBIS="1" JUCE_USE_FLAC="0"
-               JUCE_USE_MP3AUDIOFORMAT="0"/>
+  <JUCEOPTIONS JUCE_WEB_BROWSER="0" JUCE_USE_CURL="0" JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_USE_ANDROID_OBOE="1"
+               JUCE_USE_OGGVORBIS="1" JUCE_USE_FLAC="0" JUCE_USE_MP3AUDIOFORMAT="0"/>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
-    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0"
-            useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
@@ -153,16 +132,14 @@
   <EXPORTFORMATS>
     <ANDROIDSTUDIO targetFolder="Builds/Android" androidMinimumSDK="26" androidTargetSDK="35"
                    androidVersionCode="10400" androidScreenOrientation="unspecified"
-                   microphonePermissionNeeded="1" androidEnableContentSharing="1"
-                   androidPushNotifications="0" androidExternalWriteNeeded="0" androidReadMediaAudioPermission="0"
+                   microphonePermissionNeeded="1" androidEnableContentSharing="1" androidPushNotifications="0"
+                   androidExternalReadNeeded="0" androidExternalWriteNeeded="0" androidReadMediaAudioPermission="0"
                    androidReadMediaImagesPermission="0" androidReadMediaVideoPermission="0"
-                   androidInternetNeeded="0" bigIcon="KcIcon" smallIcon="KcIcon"
-                   androidBluetoothScanNeeded="0" androidBluetoothAdvertiseNeeded="0"
-                   androidBluetoothConnectNeeded="0">
+                   androidBluetoothNeeded="0" androidInternetNeeded="0" bigIcon="KcIcon" smallIcon="KcIcon"
+                   androidTheme="@android:style/Theme.DeviceDefault.NoActionBar">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" androidArchitectures="arm64-v8a" recommendedWarnings="LLVM"/>
-        <CONFIGURATION isDebug="0" name="Release" androidArchitectures="armeabi-v7a arm64-v8a"
-                       optimisation="3" recommendedWarnings="LLVM"/>
+        <CONFIGURATION isDebug="0" name="Release" androidArchitectures="armeabi-v7a arm64-v8a" optimisation="3" recommendedWarnings="LLVM"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../JUCE/modules"/>
