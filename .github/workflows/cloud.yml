@@ -44,6 +44,10 @@ jobs:
           removed=$(( $(printf '%s' "$TOKEN" | LC_ALL=C wc -c) - ${#token} ))
           prefix=no; case "$token" in cf*_*) prefix=yes ;; esac
           echo "::notice::Token: ${#token} characters kept, $removed removed (spaces, line breaks, invisible characters); starts like a Cloudflare token: $prefix"
+          if [ ${#token} -gt 90 ] || [ ${#token} -lt 30 ]; then
+            echo "::error::The CLOUDFLARE_API_TOKEN secret should be just the token (about 50 letters and numbers, starting cfut_ or similar). It has ${#token}. Paste it again with the copy button next to the token."
+            exit 1
+          fi
           echo "::add-mask::$token"
           echo "::add-mask::$account"
           if ! printf '%s' "$account" | grep -Eq '^[0-9a-fA-F]{32}$'; then
