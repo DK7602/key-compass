@@ -173,12 +173,12 @@ jobs:
 
           To install: open this page on your phone, tap KeyCompass.apk, then Open. The first time, Android asks you to
           allow installs from your browser - allow it, then tap Install."
-          git tag -f "$tag" "$GITHUB_SHA"
-          git push -f origin "refs/tags/$tag"
+          # the tag stays where it is: GitHub won't let a build move a tag onto a commit that changes workflow files,
+          # and the release page (with the newest .apk) is what matters
           if gh release view "$tag" > /dev/null 2>&1; then
             gh release edit "$tag" --title "Key Compass ${VERSION} for Android" --notes "$notes" --latest
           else
-            gh release create "$tag" --title "Key Compass ${VERSION} for Android" --notes "$notes" --latest
+            gh release create "$tag" --target "$GITHUB_SHA" --title "Key Compass ${VERSION} for Android" --notes "$notes" --latest
           fi
           gh release upload "$tag" dist/KeyCompass.apk --clobber
 
