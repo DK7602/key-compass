@@ -38,13 +38,24 @@ jobs:
             echo "::error::Add the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets (Settings > Secrets and variables > Actions)"
             exit 1
           fi
+          # copied from a phone they often pick up a line break or a space: take those out
+          token=$(printf '%s' "$TOKEN" | tr -d '[:space:]')
+          account=$(printf '%s' "$ACCOUNT" | tr -d '[:space:]')
+          echo "::add-mask::$token"
+          echo "::add-mask::$account"
+          if ! printf '%s' "$account" | grep -Eq '^[0-9a-fA-F]{32}$'; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID should be the 32 letters and numbers from the dashboard address (dash.cloudflare.com/<account id>/...)"
+            exit 1
+          fi
+          echo "CF_API_TOKEN=$token" >> "$GITHUB_ENV"
+          echo "CF_ACCOUNT_ID=$account" >> "$GITHUB_ENV"
 
       - name: Deploy to Cloudflare
         id: deploy
         uses: cloudflare/wrangler-action@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ env.CF_API_TOKEN }}
+          accountId: ${{ env.CF_ACCOUNT_ID }}
           workingDirectory: cloud
           command: deploy
 
