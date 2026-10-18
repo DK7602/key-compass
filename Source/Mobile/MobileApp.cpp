@@ -85,11 +85,13 @@ private:
         {
             if (granted)
             {
-                micAllowed = true;
-                auto setup = deviceManager.getAudioDeviceSetup();
-                setup.useDefaultInputChannels = true;
-                deviceManager.setAudioDeviceSetup (setup, true);
-                if (auto* ed = editor()) ed->setMicrophoneAllowed (true);
+                // when Android showed its question the app was paused, and resumed() reopens the audio
+                // with the microphone; otherwise reopen it here
+                if (audioRunning && processor != nullptr)
+                {
+                    deviceManager.removeAudioCallback (&player);
+                    openAudio (true);
+                }
                 return;
             }
             // Android stops asking after the second "Don't allow"; then only Settings can turn it on
@@ -139,33 +141,60 @@ private:
         if (audioRunning || processor == nullptr) return;
         audioRunning = true;
 
-        juce::RuntimePermissions::request (juce::RuntimePermissions::recordAudio, [this] (bool granted)
+        constexpr auto mic = juce::RuntimePermissions::recordAudio;
+        if (! askedForMicrophone && ! juce::RuntimePermissions::isGranted (mic))
         {
-            if (processor == nullptr || ! audioRunning) return;
-            micAllowed = granted;
-            if (! deviceManagerReady)
+            // ask once, the first time. Android's question pauses the app; when it comes back (resumed),
+            // startAudio runs again and goes by the answer - so "Don't allow" isn't asked a second time
+            askedForMicrophone = true;
+            juce::RuntimePermissions::request (mic, [this] (bool granted)
             {
-                deviceManager.initialise (granted ? 2 : 0, 2, nullptr, true);
-                deviceManagerReady = true;
-            }
-            else
+                if (processor != nullptr && audioRunning) openAudio (granted);
+            });
+            return;
+        }
+        openAudio (juce::RuntimePermissions::isGranted (mic));
+    }
+
+    void openAudio (bool granted)
+    {
+        micAllowed = granted;
+        if (! deviceManagerReady)
+        {
+            deviceManager.initialise (granted ? 2 : 0, 2, nullptr, true);
+            deviceManagerReady = true;
+        }
+        else
+        {
+            deviceManager.restartLastAudioDevice();
+        }
+
+        // the microphone can be allowed or taken away in Settings while the app is in the background
+        if (auto* device = deviceManager.getCurrentAudioDevice())
+        {
+            const bool hasInput = ! device->getActiveInputChannels().isZero();
+            if (granted != hasInput)
             {
-                deviceManager.restartLastAudioDevice();
-            }
-            if (granted && deviceManager.getCurrentAudioDevice() != nullptr
-                && deviceManager.getCurrentAudioDevice()->getActiveInputChannels().isZero())
-            {
-                // permission arrived after the device was opened without inputs: reopen it with the microphone
                 auto setup = deviceManager.getAudioDeviceSetup();
-                setup.useDefaultInputChannels = true;
+                setup.useDefaultInputChannels = granted;
+                if (! granted) setup.inputChannels.clear();
                 deviceManager.setAudioDeviceSetup (setup, true);
             }
-            player.setProcessor (processor.get());
-            deviceManager.addAudioCallback (&player);
-            enableMidiInputs();
-            if (auto* ed = editor())
-                ed->setMicrophoneAllowed (granted);
-        });
+        }
+        else if (! granted)
+        {
+            // the last setup used the microphone and can't open without it: speaker only
+            auto setup = deviceManager.getAudioDeviceSetup();
+            setup.useDefaultInputChannels = false;
+            setup.inputChannels.clear();
+            deviceManager.setAudioDeviceSetup (setup, true);
+        }
+
+        player.setProcessor (processor.get());
+        deviceManager.addAudioCallback (&player);
+        enableMidiInputs();
+        if (auto* ed = editor())
+            ed->setMicrophoneAllowed (granted);
     }
 
     void stopAudio()
@@ -225,7 +254,7 @@ private:
     juce::AudioDeviceManager deviceManager;
     juce::AudioProcessorPlayer player;
     juce::MemoryBlock lastSaved;
-    bool audioRunning = false, deviceManagerReady = false, micAllowed = false;
+    bool audioRunning = false, deviceManagerReady = false, micAllowed = false, askedForMicrophone = false;
     int midiDevicesSeen = -1;
 };
 
