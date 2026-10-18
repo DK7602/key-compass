@@ -192,4 +192,5 @@ namespace kcui
     // menu (marked with an arrow) instead of opening beside the first one.
     void showMenu (juce::PopupMenu& menu, juce::LookAndFeel& lookAndFeel, const juce::PopupMenu::Options& options,
                    std::function<void (int)> onResult);
+    std::function<void (const juce::PopupMenu&)>& menuShownForTests();     // tests: sees each menu as it is shown
 }

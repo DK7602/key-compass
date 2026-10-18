@@ -282,12 +282,19 @@ namespace kcui
         g.strokePath (chevron, PathStrokeType (3.4f, PathStrokeType::curved, PathStrokeType::rounded));
     }
 
+    std::function<void (const PopupMenu&)>& menuShownForTests()
+    {
+        static std::function<void (const PopupMenu&)> hook;
+        return hook;
+    }
+
     void showMenu (PopupMenu& menu, LookAndFeel& lookAndFeel, const PopupMenu::Options& options,
                    std::function<void (int)> onResult)
     {
         menu.setLookAndFeel (&lookAndFeel);
         if (! isTouchUI())
         {
+            if (menuShownForTests()) menuShownForTests() (menu);
             menu.showMenuAsync (options, std::move (onResult));
             return;
         }
@@ -307,6 +314,7 @@ namespace kcui
             }
             flat.addItem (std::move (item));
         }
+        if (menuShownForTests()) menuShownForTests() (flat);
         flat.showMenuAsync (options, [subMenus, options, onResult, laf = &lookAndFeel] (int result) mutable
         {
             const int sub = result - firstSubMenu;

@@ -5,6 +5,7 @@
 #include "Engine/KeyEngine.h"
 #include "SongMapper/SongModel.h"
 #include "SongMapper/Audition.h"
+#include "Sync/SongLink.h"
 
 #ifndef JucePlugin_Name
  #define JucePlugin_Name "Key Compass"      // the Android app is not built as a plug-in
@@ -58,6 +59,7 @@ public:
 
     // Song Mapper
     sm::SongMap& getSongMap() noexcept                   { return songMap; }
+    kcsync::SongLink& getSongLink() noexcept             { return *songLink; }     // My Songs and cloud sync
     sm::AuditionEngine& getAudition() noexcept           { return audition; }
     double getHostBpm() const noexcept                   { return hostBpm.load(); }   // 0 = no tempo from the host
 
@@ -103,6 +105,7 @@ private:
     std::atomic<int> mobileTab { 0 };                                   // Android app: 0 compass, 1 chords, 2 song, 3 library, 4 more
 
     sm::SongMap songMap;
+    std::unique_ptr<kcsync::SongLink> songLink;     // after songMap: goes first
     sm::AuditionEngine audition;
     std::atomic<double> hostBpm { 0.0 };
     juce::CriticalSection pendingSongLock;

@@ -111,6 +111,23 @@ adb shell monkey -p "$pkg" -c android.intent.category.LAUNCHER 1 > /dev/null 2>&
 shot 10-back 8
 alive "leaving and coming back"
 
+# My Songs and cloud sync, against the real sync server (Settings > MY SONGS > CLOUD SYNC > TURN ON SYNC).
+# Where the buttons are on this screen comes from the Linux test build ("KeyCompassMobileShots out positions").
+dp() { echo $(( $1 * dpi / 160 )); }
+tab 4; sleep 3
+adb shell input tap "$(dp 116)" "$(dp 184)"
+shot 15-mysongs 4
+adb shell input tap "$(dp 256)" "$(dp 123)"
+shot 16-cloud 4
+adb shell input tap "$(dp 208)" "$(dp 325)"
+shot 17-cloud-on 12
+alive "turning on cloud sync"
+adb shell input keyevent KEYCODE_BACK
+sleep 1
+adb shell input keyevent KEYCODE_BACK
+shot 18-back-to-settings 3
+alive "closing My Songs"
+
 adb logcat -d > "$out/logcat.txt"
 # why each window of the app opened or closed (finish reasons, restarts, process deaths)
 adb logcat -b events -d 2> /dev/null | grep -E "keycompass|am_proc_died|am_kill" | grep -E "wm_|am_" > "$out/events.txt" || true

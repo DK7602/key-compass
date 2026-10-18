@@ -102,6 +102,8 @@ namespace sm
         int selectedSection = -1;
         int selectedTray = -1;
         juce::String songName { "Song Map" };
+        juce::String songId;                     // which song in My Songs this is (see Sync/SongLibrary.h); "" = not saved there yet
+        juce::int64 libraryStamp = 0;            // the My Songs version this copy matches (to notice a newer one from another device)
 
         // ---- settings ----
         bool guitar = true;
@@ -195,7 +197,7 @@ namespace sm
 
         // ---- state ----
         juce::ValueTree toValueTree() const;
-        void fromValueTree (const juce::ValueTree&);
+        void fromValueTree (const juce::ValueTree&, bool keepUndo = false);   // keepUndo: Undo brings back what was there before
 
     private:
         void addLineNotes (Sequence& seq, int section, Lane lane, double sectionStart) const;
@@ -221,21 +223,31 @@ namespace sm
     };
 
     //==============================================================================
-    // Favourite progressions, shared by every instance and project (a small JSON file in the user's app data)
-    class FavouritesStore
+    // Favourite progressions, shared by every instance and project (a small JSON file in the user's app data).
+    // Cloud sync reads and replaces it from its own thread, so everything here is locked.
+    class FavouritesStore : public juce::ChangeBroadcaster
     {
     public:
-        FavouritesStore();
-        const std::vector<Favourite>& all() const noexcept { return items; }
+        explicit FavouritesStore (const juce::File& fileToUse = {});     // default: favourites.json in the app's data
+        std::vector<Favourite> all() const;
         bool contains (const juce::String& roman) const;
         void add (const Favourite& f);
         void remove (const juce::String& roman);
         void toggle (const Favourite& f);
 
+        // ---- cloud sync ----
+        std::function<void()> onUserChange;                  // starred or unstarred here (not by sync)
+        juce::String toJson() const;
+        static std::vector<Favourite> parse (const juce::String& json);
+        static std::vector<Favourite> merge (const std::vector<Favourite>& a, const std::vector<Favourite>& b);
+        void replaceAll (const std::vector<Favourite>& newItems);    // from the cloud: saved, no onUserChange
+
     private:
         void load();
         void save() const;
+        void userChanged();
         juce::File file;
         std::vector<Favourite> items;
+        mutable juce::CriticalSection lock;
     };
 }

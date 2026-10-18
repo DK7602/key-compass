@@ -5,6 +5,8 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Source/PluginProcessor.h"
 #include "../Source/Mobile/MobileEditor.h"
+#include "../Source/Sync/SongLink.h"
+#include "../Source/UI/MySongsView.h"
 
 using namespace juce;
 
@@ -139,6 +141,14 @@ namespace
 // the app behaves as on a touch screen because the touch switch is on), then look at the song
 namespace
 {
+    Button* findButton (Component& root, const String& text)
+    {
+        if (auto* b = dynamic_cast<Button*> (&root); b != nullptr && b->getButtonText() == text && b->isShowing()) return b;
+        for (auto* c : root.getChildren())
+            if (auto* f = findButton (*c, text)) return f;
+        return nullptr;
+    }
+
     Component* findID (Component& root, const String& id)
     {
         if (root.getComponentID() == id) return &root;
@@ -286,6 +296,60 @@ namespace
         pump (100);
         song.redo();
 
+        // --- My Songs: Settings > MY SONGS, a tap on a song opens it, back closes
+        {
+            ed.showTab (MobileEditor::moreTab);
+            pump (250);
+            auto* button = findButton (ed, "MY SONGS");
+            check (button != nullptr && button->isShowing(), "Settings has MY SONGS");
+            if (button != nullptr) f.tap (pointIn (ed, *button, 0.5f, 0.5f));
+            pump (300);
+            check (ed.getMapper().isMySongsOpen(), "MY SONGS opens My Songs");
+            auto& lib = proc.getSongLink().getHub().getLibrary();
+            sm::SongMap other;
+            other.resetSections ({ { "Verse", 8 } });
+            other.songName = "Tap Test Song";
+            other.manualBpm = 133.0;
+            lib.save (kcsync::SongLibrary::newId(), other.toValueTree(), "PC");
+            pump (300);
+            auto* view = ed.getMapper().mySongsView();
+            auto* row = view != nullptr ? view->findRow ("Tap Test Song") : nullptr;
+            check (row != nullptr && row->isShowing(), "a song made on another device is listed");
+            if (row != nullptr) f.tap (pointIn (ed, *row, 0.4f, 0.5f));
+            pump (400);
+            check (song.songName == "Tap Test Song" && std::abs (song.manualBpm - 133.0) < 0.01 && ! ed.getMapper().isMySongsOpen(),
+                   "a tap on a song opens it (and closes My Songs)");
+            ed.getMapper().showMySongs (true);
+            pump (200);
+            check (ed.handleBackButton() && ed.getMapper().isMySongsOpen() && ! ed.getMapper().mySongsView()->isShowingCloud(),
+                   "back on Cloud Sync goes to My Songs");
+            check (ed.handleBackButton() && ! ed.getMapper().isMySongsOpen(), "back again closes My Songs");
+            pump (150);
+            song.undo();
+        }
+
+        // --- the KEY menu on a touch screen: sub-menus open as a second menu (a finger can't hover)
+        {
+            ed.showTab (MobileEditor::songTab);
+            pump (250);
+            juce::PopupMenu shown;
+            bool gotMenu = false;
+            kcui::menuShownForTests() = [&] (const PopupMenu& m) { shown = m; gotMenu = true; };
+            if (auto* header = findID (ed, "header"))
+                f.tap (pointIn (ed, *header, 0.25f, 0.45f));
+            pump (300);
+            bool major = false, nested = false;
+            for (PopupMenu::MenuItemIterator it (shown, false); it.next();)
+            {
+                nested |= it.getItem().subMenu != nullptr;
+                major |= it.getItem().text.startsWith ("Major keys");
+            }
+            check (gotMenu && major && ! nested, "the KEY menu has Major keys / Minor keys as plain items");
+            kcui::menuShownForTests() = nullptr;
+            PopupMenu::dismissAllActiveMenus();
+            pump (150);
+        }
+
         // --- rotate: a phone on its side, a tablet
         ed.setBounds (0, 0, 915, 412);
         pump (100);
@@ -303,6 +367,12 @@ namespace
     }
 }
 
+namespace synctest
+{
+    void prepare (int port, const File& root);
+    int run (KeyCompassProcessor&, int port, const File& root);
+}
+
 int main (int argc, char* argv[])
 {
     ScopedJuceInitialiser_GUI juceInit;
@@ -311,6 +381,11 @@ int main (int argc, char* argv[])
     outDir.createDirectory();
     kcui::touchUIFlag() = true;
 
+    // My Songs in a test folder; cloud sync through the local test server (sync) or nowhere (everything else)
+    const int syncPort = argc > 3 ? String (argv[3]).getIntValue() : 0;
+    const auto syncRoot = outDir.getChildFile ("sync-test");
+    synctest::prepare (syncPort, syncRoot);
+
     AudioProcessor::setTypeOfNextNewPlugin (AudioProcessor::wrapperType_Standalone);
     KeyCompassProcessor proc;
     AudioProcessor::setTypeOfNextNewPlugin (AudioProcessor::wrapperType_Undefined);
@@ -318,6 +393,33 @@ int main (int argc, char* argv[])
     makeSong (proc);
     if (filter == "checks")
         return runChecks (proc);
+    if (filter == "sync")
+        return synctest::run (proc, syncPort, syncRoot);
+    if (filter == "positions")
+    {
+        // where the emulator test taps (a Pixel 6: 411 x 914 dp, status bar 49 dp, navigation handle 24 dp)
+        MobileEditor ed (proc);
+        ed.setSimulatedInsets ({ 49, 0, 24, 0 });
+        ed.setBounds (0, 0, 411, 914);
+        ed.addToDesktop (ComponentPeer::windowIgnoresKeyPresses);
+        ed.setVisible (true);
+        auto say = [&] (const char* what, Component* c)
+        {
+            if (c == nullptr) { std::cout << what << " MISSING" << std::endl; return; }
+            const auto r = ed.getLocalArea (c, c->getLocalBounds());
+            std::cout << what << " " << r.getCentreX() << " " << r.getCentreY() << std::endl;
+        };
+        ed.showTab (MobileEditor::moreTab);
+        pump (200);
+        say ("mysongs", findButton (ed, "MY SONGS"));
+        ed.getMapper().showMySongs (false);
+        pump (200);
+        say ("cloudsync", findButton (ed, "CLOUD SYNC"));
+        ed.getMapper().mySongsView()->showCloud (true);
+        pump (200);
+        say ("turnon", findButton (ed, "TURN ON SYNC"));
+        return 0;
+    }
 
     struct Shot
     {
@@ -359,7 +461,56 @@ int main (int argc, char* argv[])
         { "tabletside_mapper",  1280, 800, tabletBars, T::songTab, {} },
         { "fold_chords",     673, 841, phoneBars, T::chordsTab, {} },
         { "small_phone",     360, 740, phoneBars, T::chordsTab, {} },
+        // My Songs and cloud sync
+        { "phone_mysongs",   412, 915, phoneBars, T::moreTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
+        { "phone_cloud_off", 412, 915, phoneBars, T::moreTab, [] (MobileEditor& e) { e.getMapper().showMySongs (true); } },
+        { "phone_cloud_typing", 412, 915, phoneBars, T::moreTab, [] (MobileEditor& e)
+            {
+                e.addToDesktop (0);
+                e.setVisible (true);
+                e.getMapper().showMySongs (true);
+                pump (200);
+                if (auto* ms = e.getMapper().mySongsView())
+                    if (auto* ed = findTextEditor (*ms)) { ed->setText ("7h3q m9xd"); ed->grabKeyboardFocus(); }
+                e.setSimulatedInsets ({ 36, 0, 24, 0 }, 320);
+                pump (100);
+            } },
+        { "phone_notice",    412, 915, phoneBars, T::chordsTab, [] (MobileEditor& e)
+            { e.getMapper().showNotice ("Updated from your PC. Undo brings back what was here."); } },
+        { "side_mysongs",    915, 412, sideBars, T::songTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
+        { "tablet_mysongs",  800, 1280, tabletBars, T::songTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
+        { "small_mysongs",   360, 740, phoneBars, T::moreTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
+        { "phone_cloud_on",  412, 915, phoneBars, T::moreTab, [&proc] (MobileEditor& e)
+            {
+                auto& cloud = proc.getSongLink().getHub().getCloud();
+                if (! cloud.isOn())
+                {
+                    bool done = false;
+                    cloud.turnOnNew ([&done] (bool, const String&) { done = true; });
+                    for (int i = 0; i < 400 && ! done; ++i) pump (25);
+                    cloud.waitUntilIdleForTests (10000);
+                }
+                e.getMapper().showMySongs (true);
+            } },
+        { "tablet_cloud_on", 800, 1280, tabletBars, T::songTab, [] (MobileEditor& e) { e.getMapper().showMySongs (true); } },
+        { "phone_mysongs_synced", 412, 915, phoneBars, T::moreTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
     };
+
+    // a few songs in My Songs, made on different devices
+    {
+        auto& lib = proc.getSongLink().getHub().getLibrary();
+        const std::pair<const char*, const char*> demo[] = { { "Midnight Drive", "PC" }, { "Summer Chorus Idea", "phone" },
+                                                             { "Worship Set in G", "PC" }, { "Blues Jam", "tablet" } };
+        for (const auto& [name, device] : demo)
+        {
+            sm::SongMap m;
+            m.resetSections ({ { "Verse", 8 }, { "Chorus", 8 } });
+            m.songName = name;
+            lib.save (kcsync::SongLibrary::newId(), m.toValueTree(), device);
+            Thread::sleep (5);
+        }
+        proc.getSongLink().flush();
+    }
 
     int failures = 0;
     for (const auto& s : shots)
@@ -378,6 +529,7 @@ int main (int argc, char* argv[])
         if (! save (*ed, f)) { ++failures; std::cout << "FAILED " << f.getFullPathName() << std::endl; }
         else std::cout << "wrote " << f.getFileName() << "  (layout " << (int) ed->currentLayout() << ", panes " << ed->panelsSideBySide() << ")" << std::endl;
         ed->getMapper().closePractice();
+        ed->getMapper().closeMySongs();
         pump (50);
     }
     ignoreUnused (touch);

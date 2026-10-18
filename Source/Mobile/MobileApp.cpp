@@ -50,6 +50,12 @@ public:
 
     void suspended() override
     {
+        if (processor != nullptr)
+        {
+            // the song's last change goes into My Songs (and up to the cloud) before Android can close the app
+            processor->getSongLink().flush();
+            processor->getSongLink().getHub().getCloud().setPaused (true);
+        }
         saveState();
         stopAudio();
         juce::Desktop::getInstance().setScreenSaverEnabled (true);
@@ -57,6 +63,8 @@ public:
 
     void resumed() override
     {
+        if (processor != nullptr)
+            processor->getSongLink().getHub().getCloud().setPaused (false);     // and check for changes from other devices
         startAudio();
     }
 

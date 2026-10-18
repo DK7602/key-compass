@@ -90,6 +90,8 @@ namespace kcui
     class DragMedallion;
     class MapperBackdrop;
     class PracticeView;
+    class MySongsView;
+    class NoticeBanner;
 
     class SongMapperPage : public juce::Component, private juce::ChangeListener, private juce::Timer
     {
@@ -128,6 +130,18 @@ namespace kcui
         juce::String songFileXml() const;
         void setLockKey (bool lock);
         void showSongMenu();
+
+        // ---- My Songs and cloud sync (see MySongsView.h, Sync/SongLink.h) ----
+        void showMySongs (bool cloudPage = false);
+        void closeMySongs();
+        bool isMySongsOpen() const noexcept;
+        MySongsView* mySongsView() const noexcept     { return mySongs.get(); }
+        void showNotice (const juce::String& text);   // a short message across the top
+        NoticeBanner* noticeBanner() const noexcept   { return notice.get(); }
+        void layoutOverlays();                        // the app's screen changed size
+        void addTemplateItems (juce::PopupMenu&);     // "New song" choices (ids 11-19)
+        bool startNewSong (int itemId);               // false if it isn't one of them
+        void askAboutNewerVersion();
 
         // ---- shared state & helpers for the panels ----
         KeyCompassProcessor& proc;
@@ -211,6 +225,10 @@ namespace kcui
         std::unique_ptr<BrowserPanel> browser;
         std::unique_ptr<DragMedallion> medallion;
         std::unique_ptr<PracticeView> practice;
+        std::unique_ptr<MySongsView> mySongs;
+        std::unique_ptr<NoticeBanner> notice;
+        bool askingNewer = false;
+        juce::Component* overlayHost (float& scale, juce::Rectangle<int>& area);
         KButton switchButton, tapButton, captureButton, songButton, helpButton;
         KButton undoButton, redoButton;                // phone / tablet layouts: either side of the KEY / TEMPO plaque
         MobileLayout mobile;

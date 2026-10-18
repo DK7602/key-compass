@@ -871,6 +871,8 @@ namespace sm
     {
         juce::ValueTree t ("SongMap");
         t.setProperty ("name", songName, nullptr);
+        if (songId.isNotEmpty()) t.setProperty ("songId", songId, nullptr);
+        if (libraryStamp != 0)   t.setProperty ("libStamp", juce::String (libraryStamp), nullptr);
         t.setProperty ("guitar", guitar, nullptr);
         t.setProperty ("style", (int) style, nullptr);
         t.setProperty ("keyOverride", keyOverride, nullptr);
@@ -909,12 +911,22 @@ namespace sm
         return t;
     }
 
-    void SongMap::fromValueTree (const juce::ValueTree& t)
+    void SongMap::fromValueTree (const juce::ValueTree& t, bool keepUndo)
     {
         if (! t.hasType ("SongMap")) return;
-        undoStack.clear();
-        redoStack.clear();
+        if (keepUndo)
+        {
+            undoStack.push_back (capture());
+            redoStack.clear();
+        }
+        else
+        {
+            undoStack.clear();
+            redoStack.clear();
+        }
         songName = t.getProperty ("name", "Song Map").toString();
+        songId = t.getProperty ("songId", "").toString();
+        libraryStamp = t.getProperty ("libStamp", "0").toString().getLargeIntValue();
         guitar = (bool) t.getProperty ("guitar", true);
         style = (GuitarStyle) juce::jlimit (0, (int) GuitarStyle::NumStyles - 1, (int) t.getProperty ("style", 0));
         keyOverride = juce::jlimit (-1, 23, (int) t.getProperty ("keyOverride", -1));
@@ -1022,24 +1034,43 @@ namespace sm
     }
 
     //==============================================================================
-    FavouritesStore::FavouritesStore()
+    FavouritesStore::FavouritesStore (const juce::File& fileToUse)
     {
-        file = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
-                   .getChildFile ("KeyCompass").getChildFile ("favourites.json");
+        file = fileToUse != juce::File() ? fileToUse
+                                         : juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
+                                               .getChildFile ("KeyCompass").getChildFile ("favourites.json");
         load();
+    }
+
+    std::vector<Favourite> FavouritesStore::parse (const juce::String& text)
+    {
+        std::vector<Favourite> out;
+        const auto json = juce::JSON::parse (text);
+        if (auto* arr = json.getArray())
+            for (const auto& v : *arr)
+                if (v["roman"].toString().isNotEmpty())
+                    out.push_back ({ v["name"].toString(), v["roman"].toString(), v["genre"].toString() });
+        return out;
+    }
+
+    std::vector<Favourite> FavouritesStore::merge (const std::vector<Favourite>& a, const std::vector<Favourite>& b)
+    {
+        auto out = a;
+        for (const auto& f : b)
+            if (std::none_of (out.begin(), out.end(), [&] (const Favourite& x) { return x.roman == f.roman; }))
+                out.push_back (f);
+        return out;
     }
 
     void FavouritesStore::load()
     {
-        items.clear();
-        const auto json = juce::JSON::parse (file);
-        if (auto* arr = json.getArray())
-            for (const auto& v : *arr)
-                items.push_back ({ v["name"].toString(), v["roman"].toString(), v["genre"].toString() });
+        const juce::ScopedLock sl (lock);
+        items = parse (file.loadFileAsString());
     }
 
-    void FavouritesStore::save() const
+    juce::String FavouritesStore::toJson() const
     {
+        const juce::ScopedLock sl (lock);
         juce::Array<juce::var> arr;
         for (const auto& f : items)
         {
@@ -1049,32 +1080,68 @@ namespace sm
             o->setProperty ("genre", f.genre);
             arr.add (juce::var (o));
         }
+        return juce::JSON::toString (juce::var (arr));
+    }
+
+    void FavouritesStore::save() const
+    {
+        const auto json = toJson();
         file.getParentDirectory().createDirectory();
-        file.replaceWithText (juce::JSON::toString (juce::var (arr)));
+        file.replaceWithText (json);
+    }
+
+    std::vector<Favourite> FavouritesStore::all() const
+    {
+        const juce::ScopedLock sl (lock);
+        return items;
     }
 
     bool FavouritesStore::contains (const juce::String& roman) const
     {
+        const juce::ScopedLock sl (lock);
         for (const auto& f : items) if (f.roman == roman) return true;
         return false;
     }
 
     void FavouritesStore::add (const Favourite& f)
     {
-        if (contains (f.roman)) return;
-        items.push_back (f);
-        save();
+        {
+            const juce::ScopedLock sl (lock);
+            if (std::any_of (items.begin(), items.end(), [&] (const Favourite& x) { return x.roman == f.roman; })) return;
+            items.push_back (f);
+        }
+        userChanged();
     }
 
     void FavouritesStore::remove (const juce::String& roman)
     {
-        items.erase (std::remove_if (items.begin(), items.end(), [&] (const Favourite& f) { return f.roman == roman; }), items.end());
-        save();
+        {
+            const juce::ScopedLock sl (lock);
+            items.erase (std::remove_if (items.begin(), items.end(), [&] (const Favourite& f) { return f.roman == roman; }), items.end());
+        }
+        userChanged();
     }
 
     void FavouritesStore::toggle (const Favourite& f)
     {
         if (contains (f.roman)) remove (f.roman);
         else                    add (f);
+    }
+
+    void FavouritesStore::userChanged()
+    {
+        save();
+        sendChangeMessage();
+        if (onUserChange) onUserChange();
+    }
+
+    void FavouritesStore::replaceAll (const std::vector<Favourite>& newItems)
+    {
+        {
+            const juce::ScopedLock sl (lock);
+            items = newItems;
+        }
+        save();
+        sendChangeMessage();
     }
 }

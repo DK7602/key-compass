@@ -18,6 +18,7 @@ KeyCompassProcessor::KeyCompassProcessor()
     syncEngineParameters();
     lastSongCopy = songMap.toValueTree();
     songMap.addChangeListener (this);
+    songLink = std::make_unique<kcsync::SongLink> (songMap);
     analysisThread.startThread (juce::Thread::Priority::low);
 }
 
@@ -217,6 +218,13 @@ void KeyCompassProcessor::handleAsyncUpdate()
         audition.stop();
         songMap.fromValueTree (song);
         songMap.changed();
+        // My Songs may have a newer version (changed on another device since this was saved).
+        // The phone app just takes it; in a DAW project the editor asks first.
+       #if KC_MOBILE
+        songLink->loadedFromState (false);
+       #else
+        songLink->loadedFromState (true);
+       #endif
     }
 }
 

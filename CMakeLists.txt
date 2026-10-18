@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.22)
 
-project (KeyCompass VERSION 1.4.0 LANGUAGES C CXX)
+project (KeyCompass VERSION 1.5.0 LANGUAGES C CXX)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,7 +25,7 @@ option (KC_LINUX_TEST "Developer build for Linux without audio devices / X11 ext
 juce_add_plugin (KeyCompass
     COMPANY_NAME                "Key Compass"
     PRODUCT_NAME                "Key Compass"
-    VERSION                     1.4.0
+    VERSION                     1.5.0
     PLUGIN_MANUFACTURER_CODE    KcMp
     PLUGIN_CODE                 Kcmp
     FORMATS                     ${KC_FORMATS}
@@ -74,7 +74,11 @@ set (KC_SOURCES
     Source/SongMapper/SampleLibrary.cpp
     Source/SongMapper/Audition.cpp
     Source/UI/SongMapperView.cpp
-    Source/UI/Manual.cpp)
+    Source/UI/Manual.cpp
+    Source/UI/MySongsView.cpp
+    Source/Sync/SongLibrary.cpp
+    Source/Sync/CloudSync.cpp
+    Source/Sync/SongLink.cpp)
 
 target_sources (KeyCompass PRIVATE ${KC_SOURCES})
 
@@ -117,7 +121,7 @@ if (KC_LINUX_TEST)
 
     # the Android app's screens, drawn at phone and tablet sizes (Tests/MobileShots.cpp)
     juce_add_console_app (KeyCompassMobileShots PRODUCT_NAME "KeyCompassMobileShots")
-    target_sources (KeyCompassMobileShots PRIVATE Tests/MobileShots.cpp Source/Mobile/MobileEditor.cpp Source/Mobile/ManualViewer.cpp ${KC_SOURCES})
+    target_sources (KeyCompassMobileShots PRIVATE Tests/MobileShots.cpp Tests/SyncChecks.cpp Source/Mobile/MobileEditor.cpp Source/Mobile/ManualViewer.cpp ${KC_SOURCES})
     target_compile_definitions (KeyCompassMobileShots PRIVATE ${KC_DEFINITIONS}
         KC_MOBILE=1 JucePlugin_Build_Standalone=0 JUCE_STANDALONE_APPLICATION=1 JUCE_MODAL_LOOPS_PERMITTED=1)
     target_link_libraries (KeyCompassMobileShots PRIVATE

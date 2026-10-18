@@ -1,5 +1,6 @@
 // Key Compass - the Android app's screen (see MobileEditor.h for the three layouts)
 #include "MobileEditor.h"
+#include "../UI/MySongsView.h"
 #include "../UI/Manual.h"
 #include "../Version.h"
 
@@ -374,6 +375,7 @@ public:
         : processor (p), page (pg), song (p.getSongMap()), assets (a),
           tapButton (a, "TAP TEMPO", KButton::Look::Plaque), captureButton (a, "CAPTURE CHORDS", KButton::Look::Plaque),
           songButton (a, String (CharPointer_UTF8 ("SONG \xe2\x96\xbe")), KButton::Look::Plaque),
+          mySongsButton (a, "MY SONGS", KButton::Look::Plaque),
           playStyleBox (a, { "Block", "Pulse", "Strum", "Arpeggio" },
                         { sm::playStyleDescription (sm::PlayStyle::Block), sm::playStyleDescription (sm::PlayStyle::Pulse),
                           sm::playStyleDescription (sm::PlayStyle::Strum), sm::playStyleDescription (sm::PlayStyle::Arpeggio) }),
@@ -396,7 +398,8 @@ public:
         viewport.setScrollBarThickness (8);
         viewport.setScrollOnDragMode (Viewport::ScrollOnDragMode::all);
 
-        for (Component* c : { (Component*) &tapButton, (Component*) &captureButton, (Component*) &songButton, (Component*) &playStyleBox,
+        for (Component* c : { (Component*) &tapButton, (Component*) &captureButton, (Component*) &songButton, (Component*) &mySongsButton,
+                              (Component*) &playStyleBox,
                               (Component*) &meterBox, (Component*) &octaveBox, (Component*) &songLock, (Component*) &flats, (Component*) &volume,
                               (Component*) &shareMidi, (Component*) &shareSong, (Component*) &openSong, (Component*) &clearSong,
                               (Component*) &modeBox, (Component*) &responseBox, (Component*) &tuningBox, (Component*) &clearHistory,
@@ -406,6 +409,7 @@ public:
         tapButton.onClick = [this] { page.tapTempo(); };
         captureButton.onClick = [this] { page.captureDetectedChords(); };
         songButton.onClick = [this] { page.showSongMenu(); };
+        mySongsButton.onClick = [this] { page.showMySongs (false); };
         playStyleBox.onChange = [this] (int i) { song.playStyle = (sm::PlayStyle) i; song.changed(); };
         meterBox.onChange = [this] (int i) { song.timeSignature = i; song.changed(); };
         octaveBox.onChange = [this] (int i) { song.octave = i - 2; song.changed(); };
@@ -497,9 +501,8 @@ private:
         };
 
         heading ("SONG MAPPER");
+        pair (mySongsButton, songButton);
         pair (tapButton, captureButton);
-        songButton.setBounds ((w - jmin (w, 240)) / 2, y, jmin (w, 240), rowH - 4);
-        y += rowH + 2;
         row ("PLAY STYLE", playStyleBox);
         row ("TIME SIG.", meterBox);
         row ("OCTAVE", octaveBox);
@@ -577,7 +580,7 @@ private:
     Viewport viewport;
     Content content;
     std::vector<Label> labels;
-    KButton tapButton, captureButton, songButton;
+    KButton tapButton, captureButton, songButton, mySongsButton;
     PlainChoiceBox playStyleBox, meterBox;
     PlainStepper octaveBox;
     RoundToggle songLock, flats;
@@ -778,8 +781,14 @@ void MobileEditor::resized()
         layoutTouch (area, ! upright);
 
     practiceLayer.setBounds (area);
+    auto& page = canvas.mapper;
     for (auto* c : practiceLayer.getChildren())
-        c->setBounds (practiceLayer.getLocalBounds());
+    {
+        if (c == (Component*) page.noticeBanner()) { c->setVisible (false); continue; }
+        if (c != (Component*) page.mySongsView())                // My Songs is drawn at the layout's scale (below)
+            c->setBounds (practiceLayer.getLocalBounds());
+    }
+    page.layoutOverlays();
     practiceLayer.toFront (false);
     keepTypingVisible (keyboard);
     repaint();
@@ -790,7 +799,14 @@ void MobileEditor::keepTypingVisible (int keyboard)
     // The on-screen keyboard covers the bottom of the screen. If you're typing into something it would hide
     // (a chord name, a section name), slide the Song Mapper up so the text stays in view.
     Component* moved = layout == Layout::Classic ? (Component*) &canvas : (Component*) &canvas.mapper;
-    const auto base = layout == Layout::Classic ? canvasTransform : AffineTransform();
+    auto base = layout == Layout::Classic ? canvasTransform : AffineTransform();
+    // typing the sync code in My Songs (over the whole screen, at the layout's scale)
+    if (auto* songs = (Component*) canvas.mapper.mySongsView(); songs != nullptr && songs->isVisible() && practiceLayer.isParentOf (songs))
+        if (auto* focused = Component::getCurrentlyFocusedComponent(); focused != nullptr && songs->isParentOf (focused))
+        {
+            moved = songs;
+            base = AffineTransform::scale (songs->getTransform().mat00);
+        }
     int shift = 0;
     if (keyboard > 0)
         if (auto* focused = Component::getCurrentlyFocusedComponent())
@@ -940,6 +956,7 @@ bool MobileEditor::handleBackButton()
     auto& page = canvas.mapper;
     if (PopupMenu::dismissAllActiveMenus()) return true;
     if (manual != nullptr) { manual.reset(); return true; }
+    if (page.isMySongsOpen() && page.mySongsView() != nullptr) return page.mySongsView()->handleBack();
     if (page.isPracticeOpen()) { page.closePractice(); return true; }
     if (layout == Layout::Classic)
     {

@@ -1,5 +1,6 @@
 // Key Compass - Song Mapper page
 #include "SongMapperView.h"
+#include "MySongsView.h"
 #include "../PluginProcessor.h"
 #include "Manual.h"
 #include "../Version.h"
@@ -4487,6 +4488,7 @@ namespace kcui
         clearSong.onClick = [this] { stopPlayback(); song.clearAllChords(); };
         syncControls();
 
+        header->setComponentID ("header");
         header->setTooltip ("Click KEY to choose a key, or to let it follow (what Key Compass hears, or the key of your chords). Drag or scroll the TEMPO, or click its bottom line for options.");
         switchButton.setTooltip ("Back to the compass");
         switchButton.onClick = [this] { stopPlayback(); if (onSwitchToCompass) onSwitchToCompass(); };
@@ -4525,12 +4527,25 @@ namespace kcui
         redoButton.onClick = [this] { song.redo(); };
 
         song.addChangeListener (this);
+        favourites->addChangeListener (this);       // stars can change on another device (cloud sync)
         if (! song.tray.empty()) focused = song.tray[(size_t) jmax (0, song.selectedTray)];
+
+        auto& link = proc.getSongLink();
+        link.onNotice = [this] (const String& t) { showNotice (t); };
+        link.onSongReplaced = [this] { stopPlayback(); closePractice(); };
+        link.onNewerVersion = [this] { askAboutNewerVersion(); };
+        if (link.hasNewerVersion())
+            MessageManager::callAsync ([safe = SafePointer<SongMapperPage> (this)] { if (safe != nullptr) safe->askAboutNewerVersion(); });
         resized();
     }
 
     SongMapperPage::~SongMapperPage()
     {
+        auto& link = proc.getSongLink();
+        link.onNotice = nullptr;
+        link.onSongReplaced = nullptr;
+        link.onNewerVersion = nullptr;
+        favourites->removeChangeListener (this);
         song.removeChangeListener (this);
     }
 
@@ -4944,10 +4959,10 @@ namespace kcui
         if (! map.isValid()) return false;
         stopPlayback();
         closePractice();
-        song.checkpoint();                 // Undo brings back the sections and chords you had before
-        song.fromValueTree (map);
+        song.fromValueTree (map, true);    // Undo brings back the sections and chords you had before
         focused = song.tray.empty() ? sm::Chord() : song.tray[(size_t) jlimit (0, (int) song.tray.size() - 1, song.selectedTray)];
         song.changed();
+        proc.getSongLink().importedSong();  // into My Songs (the same song if it came from another of your devices)
         return true;
     }
 
@@ -5021,18 +5036,14 @@ namespace kcui
         PopupMenu m, templates;
         m.setLookAndFeel (&getLookAndFeel());
         const String cmd = (SystemStats::getOperatingSystemType() & SystemStats::MacOSX) != 0 ? "Cmd" : "Ctrl";
+        m.addItem (20, String (CharPointer_UTF8 ("My songs\xe2\x80\xa6  (every song you've made)")));
+        m.addItem (21, String (CharPointer_UTF8 ("Cloud sync\xe2\x80\xa6  (the same songs on your other devices)")));
+        m.addSeparator();
         m.addItem (1, "Undo", song.canUndo());
         m.addItem (2, "Redo", song.canRedo());
         m.addSeparator();
-        templates.addItem (11, "Pop  (Intro, Verse, Pre-Chorus, Chorus x3, Bridge, Outro)");
-        templates.addItem (12, "Rock  (Intro, Verse, Chorus, Verse, Chorus, Solo, Chorus, Outro)");
-        templates.addItem (13, "Hip-hop  (Intro, Hook, Verse, Hook, Verse, Hook, Outro)");
-        templates.addItem (14, "EDM  (Intro, Build, Drop, Breakdown, Build, Drop, Outro)");
-        templates.addItem (15, "Worship  (Intro, Verse, Chorus, Verse, Chorus, Bridge, Chorus, Outro)");
-        templates.addItem (16, "Country  (Intro, Verse, Chorus, Verse, Chorus, Bridge, Chorus, Outro)");
-        templates.addSeparator();
-        templates.addItem (19, "Empty song");
-        m.addSubMenu ("New song from a template", templates);
+        addTemplateItems (templates);
+        m.addSubMenu ("New song", templates);
         m.addItem (3, String (CharPointer_UTF8 ("Rename song\xe2\x80\xa6  (")) + song.songName + ")");
         m.addItem (4, String (CharPointer_UTF8 (isTouchUI() ? "Share the song as MIDI\xe2\x80\xa6" : "Save MIDI file\xe2\x80\xa6")));
         m.addItem (7, String (CharPointer_UTF8 (isTouchUI() ? "Share the song file\xe2\x80\xa6  (open it on your PC)"
@@ -5056,19 +5067,39 @@ namespace kcui
                              if (r == 6) { openManual(); return; }
                              if (r == 7) { saveSongFile(); return; }
                              if (r == 8) { openSongFile(); return; }
-                             std::vector<std::pair<String, int>> t;
-                             if (r == 11) t = { { "Intro", 4 }, { "Verse", 8 }, { "Pre-Chorus", 4 }, { "Chorus", 8 }, { "Verse", 8 }, { "Pre-Chorus", 4 }, { "Chorus", 8 }, { "Bridge", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
-                             if (r == 12) t = { { "Intro", 4 }, { "Verse", 8 }, { "Chorus", 8 }, { "Verse", 8 }, { "Chorus", 8 }, { "Solo", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
-                             if (r == 13) t = { { "Intro", 4 }, { "Hook", 8 }, { "Verse", 16 }, { "Hook", 8 }, { "Verse", 16 }, { "Hook", 8 }, { "Outro", 4 } };
-                             if (r == 14) t = { { "Intro", 8 }, { "Build", 8 }, { "Drop", 16 }, { "Breakdown", 8 }, { "Build", 8 }, { "Drop", 16 }, { "Outro", 8 } };
-                             if (r == 15) t = { { "Intro", 4 }, { "Verse", 8 }, { "Chorus", 8 }, { "Verse", 8 }, { "Chorus", 8 }, { "Bridge", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
-                             if (r == 16) t = { { "Intro", 4 }, { "Verse", 16 }, { "Chorus", 8 }, { "Verse", 16 }, { "Chorus", 8 }, { "Bridge", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
-                             if (r >= 11 && r <= 19)
-                             {
-                                 stopPlayback();
-                                 song.resetSections (t);
-                             }
+                             if (r == 20) { showMySongs (false); return; }
+                             if (r == 21) { showMySongs (true); return; }
+                             startNewSong (r);
                          });
+    }
+
+    void SongMapperPage::addTemplateItems (PopupMenu& templates)
+    {
+        templates.addItem (11, "Pop  (Intro, Verse, Pre-Chorus, Chorus x3, Bridge, Outro)");
+        templates.addItem (12, "Rock  (Intro, Verse, Chorus, Verse, Chorus, Solo, Chorus, Outro)");
+        templates.addItem (13, "Hip-hop  (Intro, Hook, Verse, Hook, Verse, Hook, Outro)");
+        templates.addItem (14, "EDM  (Intro, Build, Drop, Breakdown, Build, Drop, Outro)");
+        templates.addItem (15, "Worship  (Intro, Verse, Chorus, Verse, Chorus, Bridge, Chorus, Outro)");
+        templates.addItem (16, "Country  (Intro, Verse, Chorus, Verse, Chorus, Bridge, Chorus, Outro)");
+        templates.addSeparator();
+        templates.addItem (19, "Empty song");
+        templates.addSectionHeader ("The song open now stays in My Songs");
+    }
+
+    bool SongMapperPage::startNewSong (int r)
+    {
+            std::vector<std::pair<String, int>> t;
+            if (r == 11) t = { { "Intro", 4 }, { "Verse", 8 }, { "Pre-Chorus", 4 }, { "Chorus", 8 }, { "Verse", 8 }, { "Pre-Chorus", 4 }, { "Chorus", 8 }, { "Bridge", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
+            if (r == 12) t = { { "Intro", 4 }, { "Verse", 8 }, { "Chorus", 8 }, { "Verse", 8 }, { "Chorus", 8 }, { "Solo", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
+            if (r == 13) t = { { "Intro", 4 }, { "Hook", 8 }, { "Verse", 16 }, { "Hook", 8 }, { "Verse", 16 }, { "Hook", 8 }, { "Outro", 4 } };
+            if (r == 14) t = { { "Intro", 8 }, { "Build", 8 }, { "Drop", 16 }, { "Breakdown", 8 }, { "Build", 8 }, { "Drop", 16 }, { "Outro", 8 } };
+            if (r == 15) t = { { "Intro", 4 }, { "Verse", 8 }, { "Chorus", 8 }, { "Verse", 8 }, { "Chorus", 8 }, { "Bridge", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
+            if (r == 16) t = { { "Intro", 4 }, { "Verse", 16 }, { "Chorus", 8 }, { "Verse", 16 }, { "Chorus", 8 }, { "Bridge", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
+            if (r < 11 || r > 19) return false;
+            stopPlayback();
+            closePractice();
+            proc.getSongLink().newSong (t);       // a new song in My Songs; the old one stays there
+            return true;
     }
 
     void SongMapperPage::renameSong()
@@ -5153,6 +5184,101 @@ namespace kcui
         practice->setSource (source);
         practice->toFront (true);
         practice->grabKeyboardFocus();
+    }
+
+    // the practice view, My Songs and notices go over everything: the Song Mapper page with the editor's plates
+    // (the PC), or the app's whole screen, drawn at the layout's scale (phone / tablet)
+    Component* SongMapperPage::overlayHost (float& scale, Rectangle<int>& area)
+    {
+        Component* host = getParentComponent() != nullptr ? getParentComponent() : this;
+        scale = 1.55f;               // the PC / an upright tablet: the page is drawn small, so these are drawn bigger
+        area = host == this ? getLocalBounds() : getBounds();
+        if (practiceHost)
+            if (auto* h = practiceHost())
+                if (h != this && h != getParentComponent())
+                {
+                    host = h;
+                    scale = mobile.active ? jlimit (0.8f, 1.4f, mobile.scale) : 1.0f;
+                    area = h->getLocalBounds();
+                }
+        return host;
+    }
+
+    void SongMapperPage::showMySongs (bool cloudPage)
+    {
+        if (mySongs == nullptr)
+        {
+            mySongs = std::make_unique<MySongsView> (*this);
+            mySongs->onClose = [this] { closeMySongs(); };
+        }
+        float scale;
+        Rectangle<int> area;
+        auto* host = overlayHost (scale, area);
+        host->addAndMakeVisible (*mySongs);
+        layoutOverlays();
+        mySongs->showCloud (cloudPage);
+        mySongs->toFront (true);
+    }
+
+    void SongMapperPage::layoutOverlays()
+    {
+        float scale;
+        Rectangle<int> area;
+        overlayHost (scale, area);
+        if (mySongs != nullptr && mySongs->isVisible())
+        {
+            mySongs->setTransform (AffineTransform::scale (scale));
+            mySongs->setBounds (Rectangle<float> ((float) area.getX() / scale, (float) area.getY() / scale,
+                                                  (float) area.getWidth() / scale, (float) area.getHeight() / scale).toNearestInt());
+        }
+    }
+
+    void SongMapperPage::closeMySongs()
+    {
+        if (mySongs == nullptr) return;
+        mySongs->setVisible (false);
+        MessageManager::callAsync ([safe = SafePointer<SongMapperPage> (this)]
+        {
+            if (safe == nullptr) return;
+            safe->mySongs.reset();
+            safe->takeFocus();
+        });
+    }
+
+    bool SongMapperPage::isMySongsOpen() const noexcept
+    {
+        return mySongs != nullptr && mySongs->isVisible();
+    }
+
+    void SongMapperPage::showNotice (const String& text)
+    {
+        if (notice == nullptr) notice = std::make_unique<NoticeBanner> (assets);
+        float scale;
+        Rectangle<int> area;
+        auto* host = overlayHost (scale, area);
+        notice->show (text, *host, area, scale);
+    }
+
+    void SongMapperPage::askAboutNewerVersion()
+    {
+        auto& link = proc.getSongLink();
+        if (! link.hasNewerVersion() || askingNewer) return;
+        askingNewer = true;
+        AlertWindow::showAsync (MessageBoxOptions().withIconType (MessageBoxIconType::NoIcon)
+                                    .withTitle ("A newer version of this song")
+                                    .withMessage ("\"" + song.songName + "\" was changed on " + link.newerDescription()
+                                                  + " after this was saved.\n\nLoad the newer version, or keep this one? "
+                                                    "Either way the other one stays in My Songs.")
+                                    .withButton ("LOAD THE NEWER ONE").withButton ("KEEP THIS ONE")
+                                    .withAssociatedComponent (this),
+                                [safe = SafePointer<SongMapperPage> (this)] (int r)
+                                {
+                                    if (safe == nullptr) return;
+                                    safe->askingNewer = false;
+                                    auto& l = safe->proc.getSongLink();
+                                    if (r == 1) l.loadNewer();
+                                    else        l.keepThis();
+                                });
     }
 
     void SongMapperPage::closePractice()
