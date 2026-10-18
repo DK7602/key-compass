@@ -1265,7 +1265,10 @@ namespace kcui
             {
                 g.setColour (Palette::inkSoft);
                 g.setFont (page.assets.baskItalic (17.0f));
-                g.drawFittedText ("Pick a progression on the right, use KEY CHORDS, or type a chord below.",
+                // on a phone the progressions are on their own tab
+                const bool browserElsewhere = page.isMobileLayout() && page.getMobileLayout().browser.isEmpty();
+                g.drawFittedText (browserElsewhere ? "Pick a progression in LIBRARY, use KEY CHORDS, or type a chord below."
+                                                   : "Pick a progression on the right, use KEY CHORDS, or type a chord below.",
                                   diagramArea.reduced (10, 30), Justification::centred, 3);
             }
 
@@ -4440,14 +4443,14 @@ namespace kcui
           captureButton (a, "CAPTURE CHORDS", KButton::Look::Plaque),
           songButton (a, String (CharPointer_UTF8 ("SONG \xe2\x96\xbe")), KButton::Look::Plaque),
           helpButton (a, "?", KButton::Look::Round),
+          undoButton (a, String (CharPointer_UTF8 ("\xe2\x86\xb6")), KButton::Look::Round),
+          redoButton (a, String (CharPointer_UTF8 ("\xe2\x86\xb7")), KButton::Look::Round),
           playStyleBox (a, { "Block", "Pulse", "Strum", "Arpeggio" },
                            { sm::playStyleDescription (sm::PlayStyle::Block), sm::playStyleDescription (sm::PlayStyle::Pulse),
                              sm::playStyleDescription (sm::PlayStyle::Strum), sm::playStyleDescription (sm::PlayStyle::Arpeggio) }),
           meterBox (a, { "4/4", "3/4", "6/8" }, { "four beats to a bar", "waltz time", "two swaying beats" }),
           octaveBox (a, { "-2 OCT", "-1 OCT", "NORMAL", "+1 OCT", "+2 OCT" }, 2),
-          lockKey (a, RoundToggle::Icon::Lock),
-          undoButton (a, String (CharPointer_UTF8 ("\xe2\x86\xb6")), KButton::Look::Round),
-          redoButton (a, String (CharPointer_UTF8 ("\xe2\x86\xb7")), KButton::Look::Round)
+          lockKey (a, RoundToggle::Icon::Lock)
     {
         setSize (Layout::designWidth, Layout::designHeight);
         setInterceptsMouseClicks (false, true);
