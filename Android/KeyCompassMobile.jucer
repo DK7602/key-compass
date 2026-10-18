@@ -106,6 +106,8 @@
       <FILE id="Kres061" name="gtr_72.ogg" compile="0" resource="1" file="../Resources/samples/gtr_72.ogg"/>
       <FILE id="Kres062" name="gtr_73.ogg" compile="0" resource="1" file="../Resources/samples/gtr_73.ogg"/>
       <FILE id="Kres063" name="gtr_74.ogg" compile="0" resource="1" file="../Resources/samples/gtr_74.ogg"/>
+      <FILE id="Kres064" name="map.jpg" compile="0" resource="1" file="../Resources/mobile/map.jpg"/>
+      <FILE id="Kres065" name="panel.jpg" compile="0" resource="1" file="../Resources/mobile/panel.jpg"/>
       <FILE id="KcIcon" name="KeyCompassIcon.png" compile="0" resource="0" file="../Resources/KeyCompassIcon.png"/>
     </GROUP>
   </MAINGROUP>

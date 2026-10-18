@@ -53,6 +53,8 @@ juce_add_binary_data (KeyCompassAssets
         Resources/face.jpg
         Resources/mapper_bg.jpg
         Resources/plaque.png
+        Resources/mobile/panel.jpg
+        Resources/mobile/map.jpg
         Resources/fonts/CinzelBold.ttf
         Resources/fonts/BaskervilleBold.ttf
         Resources/fonts/BaskervilleBoldItalic.ttf

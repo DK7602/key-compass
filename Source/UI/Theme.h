@@ -14,6 +14,7 @@ namespace kcui
         juce::Typeface::Ptr cinzelBold, baskBold, baskBoldItalic, baskRegular;
         juce::Image background, face;
         juce::Image mapperBackground, plaque;     // Song Mapper page art (1.5x / 2x design size)
+        juce::Image mobilePanel, mobileMap;       // phone / tablet layouts: a blank framed panel (1.5x), the old map
 
         juce::Font cinzel (float height) const          { return juce::Font (juce::FontOptions (cinzelBold).withHeight (height)); }
         juce::Font bask (float height) const            { return juce::Font (juce::FontOptions (baskBold).withHeight (height)); }

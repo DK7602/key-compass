@@ -2,6 +2,7 @@
 #include "SongMapperView.h"
 #include "../PluginProcessor.h"
 #include "Manual.h"
+#include "../Version.h"
 #include <optional>
 #include <numeric>
 
@@ -396,6 +397,75 @@ namespace kcui
         }
     }
 
+    void paintFramedPanel (Graphics& g, Assets& a, Rectangle<float> r, const String& title)
+    {
+        const auto& img = a.mobilePanel;
+        if (! img.isValid())
+        {
+            paintBrassPanel (g, a, r, title);
+            return;
+        }
+        // The art is the CHORD DIAGRAMS panel at 1.5x with a blank scroll. It is drawn in nine slices so the
+        // frame keeps its thickness at any size: corners as they are, edges and parchment stretched.
+        // Each row has its own column cuts (the scroll rollers at the top, the ornaments at the bottom).
+        Graphics::ScopedSaveState save (g);
+        g.setImageResamplingQuality (Graphics::highResamplingQuality);
+        constexpr float k = 1.0f / 1.5f;                                  // art pixels -> design pixels
+        const float iw = (float) img.getWidth(), ih = (float) img.getHeight();
+        const float rows[4] = { 0.0f, 62.0f, ih - 120.0f, ih };
+        const float cuts[3][2] = { { 100.0f, iw - 100.0f }, { 45.0f, iw - 45.0f }, { 125.0f, iw - 125.0f } };
+        const float topH = rows[1] * k, botH = (rows[3] - rows[2]) * k;
+        const float dy[4] = { r.getY(), r.getY() + topH, r.getBottom() - botH, r.getBottom() };
+        for (int row = 0; row < 3; ++row)
+        {
+            const float sx[4] = { 0.0f, cuts[row][0], cuts[row][1], iw };
+            const float leftW = cuts[row][0] * k, rightW = (iw - cuts[row][1]) * k;
+            const float dx[4] = { r.getX(), r.getX() + leftW, r.getRight() - rightW, r.getRight() };
+            for (int col = 0; col < 3; ++col)
+            {
+                const Rectangle<float> dst (dx[col], dy[row], dx[col + 1] - dx[col], dy[row + 1] - dy[row]);
+                if (dst.getWidth() < 0.5f || dst.getHeight() < 0.5f) continue;
+                const auto src = Rectangle<float> (sx[col], rows[row], sx[col + 1] - sx[col], rows[row + 1] - rows[row]).toNearestInt();
+                // overlap by a hair so no seams show between the slices
+                g.drawImage (img.getClippedImage (src), dst.expanded (0.35f), RectanglePlacement::stretchToFit, false);
+            }
+        }
+        if (title.isNotEmpty())
+        {
+            // engraved on the scroll: dark ink with a light lip under it
+            const float scrollL = r.getX() + 96.0f * k, scrollR = r.getRight() - 96.0f * k;
+            const Rectangle<float> t (scrollL, r.getY() + 5.0f * k, scrollR - scrollL, 30.0f * k);
+            Font f = a.cinzel (17.0f);
+            while (textWidth (f, title) > t.getWidth() - 8.0f && f.getHeight() > 9.0f) f = f.withHeight (f.getHeight() - 0.5f);
+            g.setFont (f);
+            g.setColour (Colours::white.withAlpha (0.45f));
+            g.drawText (title, t.translated (0.0f, 1.0f), Justification::centred, false);
+            g.setColour (Colour (0xff3e2a14));
+            g.drawText (title, t, Justification::centred, false);
+        }
+    }
+
+    void LongPress::mouseDown (const MouseEvent& e)
+    {
+        didFire = false;
+        stopTimer();
+        if (isTouchUI() && ! e.mods.isPopupMenu())
+            startTimer (holdMs);
+    }
+
+    void LongPress::mouseDrag (const MouseEvent& e)
+    {
+        if (e.getDistanceFromDragStart() > 10)
+            stopTimer();
+    }
+
+    void LongPress::timerCallback()
+    {
+        stopTimer();
+        didFire = true;
+        if (onLongPress) onLongPress();
+    }
+
     // the i-th white key of a keyboard that starts at the white key lowNote
     static int whiteKeyNote (int lowNote, int i) noexcept
     {
@@ -575,7 +645,14 @@ namespace kcui
 
         void paint (Graphics& g) override
         {
-            // the brass-framed parchment plate and its KEY / TEMPO labels are part of the page art
+            // the brass-framed parchment plate and its KEY / TEMPO labels are part of the page art;
+            // on a phone there is no painted page, so the plate is cut out of it
+            if (page.isMobileLayout() && page.assets.mapperBackground.isValid())
+            {
+                const auto src = headerArea.toFloat() * 1.5f;
+                g.setImageResamplingQuality (Graphics::highResamplingQuality);
+                g.drawImage (page.assets.mapperBackground.getClippedImage (src.toNearestInt()), getLocalBounds().toFloat(), RectanglePlacement::stretchToFit);
+            }
             auto left = keyZone().toFloat(), right = tempoZone().toFloat();
 
             auto drawCol = [&] (Rectangle<float> z, const String& value, const String& badge, bool glow)
@@ -630,9 +707,18 @@ namespace kcui
             dragging = true;
         }
 
+        void mouseUp (const MouseEvent& e) override
+        {
+            // a tap (no drag) on the tempo opens its options on a touch screen
+            if (dragging && isTouchUI() && e.getDistanceFromDragStart() < 6 && tempoZone().contains (e.getPosition()))
+                showTempoMenu();
+            dragging = false;
+        }
+
         void mouseDrag (const MouseEvent& e) override
         {
             if (! dragging) return;
+            if (isTouchUI() && e.getDistanceFromDragStart() < 6) return;
             const double v = jlimit (30.0, 300.0, std::round (dragStart - e.getDistanceFromDragStartY() * (e.mods.isShiftDown() ? 0.1 : 0.5)));
             page.song.manualBpm = v;
             page.song.followHostTempo = false;
@@ -868,12 +954,19 @@ namespace kcui
             }
             page.song.selectedTray = pressed;
             page.focusChord (tray[(size_t) pressed]);
+            // touch screens: press and hold for the card's menu
+            hold.onLongPress = [this, idx = pressed] { if (! dragStarted) showCardMenu (idx); };
+            hold.mouseDown (e);
         }
+
+        void mouseUp (const MouseEvent&) override { hold.mouseUp(); }
 
         void mouseDrag (const MouseEvent& e) override
         {
+            hold.mouseDrag (e);
             auto& tray = page.song.tray;
-            if (dragStarted || pressed < 0 || pressed >= (int) tray.size() || e.getDistanceFromDragStart() < 6) return;
+            if (hold.fired() || dragStarted || pressed < 0 || pressed >= (int) tray.size() || e.getDistanceFromDragStart() < 6) return;
+            hold.cancel();
             dragStarted = true;
             auto d = makeDescription ("chord");
             d.getDynamicObject()->setProperty ("chords", String (tray[(size_t) pressed].id()));
@@ -969,6 +1062,7 @@ namespace kcui
         SongMapperPage& page;
         int pressed = -1, insertIndex = -1;
         bool dragStarted = false;
+        LongPress hold;
     };
 
     class ChordPanel : public Component, private Timer
@@ -1046,17 +1140,46 @@ namespace kcui
         void resized() override
         {
             auto r = panelContent (getLocalBounds());
-            auto row = r.removeFromTop (38);
+            // A short, wide panel (a phone on its side) puts the diagram on the left and the progression on the right
+            const bool wide = r.getWidth() > 500 && r.getHeight() < 470;
+            auto left = wide ? r.removeFromLeft ((r.getWidth() - 16) / 2) : r;
+            if (wide) r.removeFromLeft (16);
+            auto& top = wide ? left : r;
+
+            auto row = top.removeFromTop (38);
             guitarBtn.setBounds (row.removeFromLeft (72).reduced (0, 3));
             row.removeFromLeft (3);
             pianoBtn.setBounds (row.removeFromLeft (62).reduced (0, 3));
             row.removeFromLeft (4);
             voicing.setBounds (row.reduced (0, 1));
-            nameArea = r.removeFromTop (40);
-            diagramArea = r.removeFromTop (148);
+            nameArea = top.removeFromTop (40);
+
+            // the diagram and the progression cards share whatever height the panel has beyond the desktop's
+            int diagramH = 148, gridH = 168;
+            if (wide)
+            {
+                diagramH = jmax (110, top.getHeight());
+                gridH = jlimit (120, 260, r.getHeight() - 26 - 6 - 34 - 5 - 34 - 5 - 36);
+            }
+            else
+            {
+                const int extra = r.getHeight() - (148 + 26 + 168 + 6 + 34 + 5 + 34 + 5 + 36);
+                if (extra >= 0)
+                {
+                    diagramH += jmin (120, (extra * 55) / 100);
+                    gridH += jmin (150, extra - (diagramH - 148));
+                }
+                else
+                {
+                    const int fromDiagram = jmin (-extra, 38);
+                    diagramH -= fromDiagram;
+                    gridH = jmax (120, gridH - (-extra - fromDiagram));
+                }
+            }
+            diagramArea = top.removeFromTop (diagramH);
             expandBtn.setBounds (diagramArea.getRight() - 40, diagramArea.getY() + 2, 40, 40);
             trayLabel = r.removeFromTop (26);
-            grid.setBounds (r.removeFromTop (168));
+            grid.setBounds (r.removeFromTop (gridH));
             r.removeFromTop (6);
             auto er = r.removeFromTop (34);
             keyChords.setBounds (er.removeFromRight (104));
@@ -1080,6 +1203,7 @@ namespace kcui
 
         void paint (Graphics& g) override
         {
+            if (page.isMobileLayout()) paintFramedPanel (g, page.assets, getLocalBounds().toFloat(), "CHORD DIAGRAMS");
             guitarBtn.lit = page.song.guitar;
             pianoBtn.lit = ! page.song.guitar;
             voicing.text = shortStyleName (page.song.guitar || page.song.style != sm::GuitarStyle::Barre ? page.song.style : sm::GuitarStyle::Standard, page.song.guitar);
@@ -1173,7 +1297,12 @@ namespace kcui
         bool entryError = false;
 
         // ---- playable diagram: click a fret, string marker or key to hear just that note ----
-        Rectangle<float> guitarRect() const   { return diagramArea.toFloat().withSizeKeepingCentre (150.0f, (float) diagramArea.getHeight() - 6.0f); }
+        Rectangle<float> guitarRect() const
+        {
+            // 150 x 142 on the desktop; keeps that shape when a phone gives the diagram more room
+            const float h = (float) diagramArea.getHeight() - 6.0f;
+            return diagramArea.toFloat().withSizeKeepingCentre (jmin ((float) diagramArea.getWidth() - 50.0f, h * 150.0f / 142.0f), h);
+        }
         Rectangle<float> keyboardRect() const { return diagramArea.toFloat().reduced (2.0f, 26.0f); }
         Rectangle<float> flashRect;
         bool flashRound = false;
@@ -1363,9 +1492,10 @@ namespace kcui
     class LaneView : public Component, public SettableTooltipClient, private ScrollBar::Listener
     {
     public:
-        static constexpr int headerH = 36, nameStripH = 17, rollH = 206, barH = 9, gutterW = 38, numRows = 15;
+        static constexpr int headerH = 36, nameStripH = 17, barH = 9, gutterW = 38, numRows = 15;
+        static int rollH() { return isTouchUI() ? 262 : 206; }      // taller rows for fingers
         static constexpr int maxRows = 20;     // 15 notes of the key, plus room for chord notes from outside it
-        static int heightFor() { return headerH + 2 + rollH + barH + 4; }
+        static int heightFor() { return headerH + 2 + rollH() + barH + 4; }
 
         LaneView (SongMapperPage& p, int sectionIndex, sm::Lane l)
             : page (p), section (sectionIndex), lane (l), loopBox (p.assets), fillBox (p.assets),
@@ -1448,7 +1578,7 @@ namespace kcui
             }
             loopBox.setBounds (h.removeFromRight (jmin (140, h.getWidth() - 62)));
             labelArea = h;
-            rollArea = getLocalBounds().withTrimmedTop (headerH + 2).withHeight (rollH);
+            rollArea = getLocalBounds().withTrimmedTop (headerH + 2).withHeight (rollH());
             hbar.setBounds (Rectangle<int> ((int) gridX0(), rollArea.getBottom() + 1, (int) gridW(), barH - 1));
             updateScrollRange();
         }
@@ -1546,9 +1676,10 @@ namespace kcui
             {
                 if (ns[(size_t) i].start >= loopBeats() - 1.0e-6) continue;
                 const auto r = noteRect (ns[(size_t) i], rows);
-                if (r.expanded (0.0f, 1.0f).contains (p))
+                if (r.expanded (isTouchUI() ? 2.0f : 0.0f, isTouchUI() ? 3.0f : 1.0f).contains (p))
                 {
-                    onEnd = p.x > r.getRight() - jmin (7.0f, r.getWidth() * 0.35f);
+                    // a finger needs a bigger handle on the note's end
+                    onEnd = p.x > r.getRight() - (isTouchUI() ? jmin (18.0f, r.getWidth() * 0.45f) : jmin (7.0f, r.getWidth() * 0.35f));
                     return i;
                 }
             }
@@ -1726,10 +1857,42 @@ namespace kcui
         {
             dragStarted = false;
             resizing = false;
+            pendingTap = false;
+            sideScroll = false;
+            hold.cancel();
+            setViewportIgnoreDragFlag (false);
             if (e.eventComponent == &dawBtn) return;
             if (! valid() || ! rollArea.contains (e.getPosition())) return;
             grabKeyboardFocus();
             const auto p = e.position;
+            if (isTouchUI() && ! e.mods.isPopupMenu() && p.x >= gridX0() - 1.0f && p.y >= rowsArea().getY())
+            {
+                bool end = false;
+                const int touched = noteAt (p, end);
+                if (touched < 0)
+                {
+                    // empty roll on a touch screen: a tap adds a note, a swipe scrolls (the song, or a long row sideways),
+                    // press and hold for the row's menu
+                    pendingTap = true;
+                    scrollStart = scrollX;
+                    hold.onLongPress = [this] { pendingTap = false; showRollMenu(); };
+                    hold.mouseDown (e);
+                    return;
+                }
+                // a note: it moves or stretches with the finger (the song doesn't scroll), press and hold for its menu
+                setViewportIgnoreDragFlag (true);
+                hold.onLongPress = [this, touched]
+                {
+                    if (resizing) return;
+                    editing = false;
+                    mode = Mode::None;
+                    dragNote = -1;
+                    selected = touched;
+                    repaint();
+                    showNoteMenu (touched);
+                };
+                hold.mouseDown (e);
+            }
             if (p.x < gridX0() - 1.0f)
             {
                 // the octave arrows at the top of the gutter; a note name plays that note
@@ -1800,9 +1963,27 @@ namespace kcui
 
         void mouseDrag (const MouseEvent& e) override
         {
+            hold.mouseDrag (e);
+            if (pendingTap)
+            {
+                // a swipe that starts on empty roll: sideways scrolls a long row, anything else scrolls the song
+                if (e.getDistanceFromDragStart() <= 8) return;
+                const auto d = e.getOffsetFromDragStart();
+                if (! sideScroll && hbar.isVisible() && std::abs (d.x) > std::abs (d.y))
+                {
+                    sideScroll = true;
+                    setViewportIgnoreDragFlag (true);
+                }
+                if (sideScroll)
+                    hbar.setCurrentRangeStart ((double) scrollStart - (double) d.x);
+                else
+                    pendingTap = false;          // the song list scrolls instead
+                return;
+            }
+            if (hold.fired()) return;
             if (e.eventComponent == &dawBtn)
             {
-                if (dragStarted || e.getDistanceFromDragStart() < 6) return;
+                if (isTouchUI() || dragStarted || e.getDistanceFromDragStart() < 6) return;
                 dragStarted = true;
                 const auto f = page.midiFile (section, sm::laneBit (lane));
                 if (f.existsAsFile())
@@ -1838,6 +2019,27 @@ namespace kcui
 
         void mouseUp (const MouseEvent& e) override
         {
+            hold.mouseUp();
+            if (isTouchUI() && e.eventComponent == &dawBtn && e.getDistanceFromDragStart() < 8)
+            {
+                page.shareMidi (section, sm::laneBit (lane));
+                return;
+            }
+            if (pendingTap)
+            {
+                pendingTap = false;
+                if (! sideScroll && ! hold.fired() && e.getDistanceFromDragStart() <= 8)
+                    addNoteAt (e.mouseDownPosition);
+                sideScroll = false;
+                setViewportIgnoreDragFlag (false);
+                return;
+            }
+            setViewportIgnoreDragFlag (false);
+            if (hold.fired())
+            {
+                editing = false;
+                return;
+            }
             if (e.eventComponent == &dawBtn || ! editing) return;
             if (mode == Mode::Resize && resizing && isPositiveAndBelow (dragNote, (int) working.size()))
                 newLength = working[(size_t) dragNote].length;     // new notes take the last length you set
@@ -1888,6 +2090,26 @@ namespace kcui
 
     private:
         enum class Mode { None, Move, Resize };
+
+        // a tap on an empty part of the roll (touch screens): a note there, as long as the last one you set
+        void addNoteAt (Point<float> p)
+        {
+            if (! valid()) return;
+            const auto rows = rowPitches();
+            const double L = loopBeats(), step = 0.5;
+            const int row = rowAt (p.y);
+            sm::Note n;
+            n.start = jlimit (0.0, jmax (0.0, L - step), std::floor (beatAt (p.x) / step + 1.0e-6) * step);
+            n.length = jmax (step, jmin (newLength, L - n.start));
+            n.pitch = row < (int) rows.size() ? rows[(size_t) row] : 60;
+            n.velocity = std::abs (std::remainder (n.start, 1.0)) < 1.0e-6 ? 0.84f : 0.72f;
+            working = line().notes;
+            working.push_back (n);
+            selected = (int) working.size() - 1;
+            editing = true;
+            page.auditionNote (n.pitch, soundFor());
+            commit();
+        }
 
         int soundFor() const { return lane == sm::Lane::Bass ? 1 : -1; }
 
@@ -2034,6 +2256,9 @@ namespace kcui
         int dragNote = -1, selected = -1, lastPitch = -1, grabRow = -1;
         Mode mode = Mode::None;
         double grabBeat = 0.0, newLength = 1.0;
+        LongPress hold;
+        bool pendingTap = false, sideScroll = false;     // touch: waiting to see if a press on empty roll is a tap or a swipe
+        float scrollStart = 0.0f;
     };
 
     class SectionRow : public Component, public DragAndDropTarget
@@ -2312,7 +2537,42 @@ namespace kcui
         {
             pressedChip = -1;
             dragStarted = false;
+            hold.cancel();
             if (e.eventComponent == &dawBtn || ! valid()) return;
+            if (isTouchUI() && ! e.mods.isPopupMenu())
+            {
+                // a touch: a swipe scrolls the song, a tap acts when the finger lifts, press and hold opens the menu
+                const auto p = e.position;
+                hold.onLongPress = [this, p]
+                {
+                    if (! valid()) return;
+                    page.song.selectedSection = index;
+                    if (const int chip = chipAt (p); chip >= 0)
+                    {
+                        page.focusChord (section().chords[(size_t) chip], false);
+                        showChipMenu (chip);
+                    }
+                    else
+                        showSectionMenu();
+                    page.song.changed();
+                };
+                hold.mouseDown (e);
+                return;
+            }
+            press (e);
+        }
+
+        void mouseUp (const MouseEvent& e) override
+        {
+            hold.mouseUp();
+            if (! isTouchUI() || hold.fired() || e.getDistanceFromDragStart() > 8) return;
+            if (e.eventComponent == &dawBtn) { page.shareMidi (index); return; }
+            if (valid()) press (e);      // a tap
+        }
+
+        // what a click (or a tap) does
+        void press (const MouseEvent& e)
+        {
             page.takeFocus();
 
             page.song.selectedSection = index;
@@ -2348,6 +2608,8 @@ namespace kcui
 
         void mouseDrag (const MouseEvent& e) override
         {
+            hold.mouseDrag (e);
+            if (isTouchUI()) return;         // on a touch screen a swipe scrolls the song (the menus move things)
             if (dragStarted || e.getDistanceFromDragStart() < 6) return;
 
             if (e.eventComponent == &dawBtn)
@@ -2408,10 +2670,13 @@ namespace kcui
             m.setLookAndFeel (&getLookAndFeel());
             auto chords = std::make_shared<std::vector<sm::Chord>>();
             page.fillChordMenu (change, 1000, *chords);
+            const int count = (int) section().chords.size();
             m.addItem (1, "Play");
             m.addSubMenu ("Change to", change);
             m.addItem (2, "Duplicate");
             m.addItem (3, "Copy to progression");
+            m.addItem (5, String (CharPointer_UTF8 ("Move left  \xe2\x97\x82")), chip > 0);
+            m.addItem (6, String (CharPointer_UTF8 ("Move right  \xe2\x96\xb8")), chip < count - 1);
             m.addSeparator();
             m.addItem (4, "Remove");
             m.showMenuAsync (PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
@@ -2419,6 +2684,8 @@ namespace kcui
                              {
                                  if (safe == nullptr || r == 0 || chip >= (int) section().chords.size()) return;
                                  const auto c = section().chords[(size_t) chip];
+                                 if (r == 5) { page.song.moveChord (index, chip, index, chip - 1); return; }
+                                 if (r == 6) { page.song.moveChord (index, chip, index, chip + 2); return; }     // an insertion point
                                  if (r == 1) page.auditionChord (c);
                                  else if (r == 2) page.song.insertChords (index, { c }, chip + 1);
                                  else if (r == 3) page.song.insertTray (c);
@@ -2561,6 +2828,7 @@ namespace kcui
         bool renameDone = false;
         int pressedChip = -1, insertIndex = -1;
         bool dragStarted = false, grabbedHeader = false, dropHighlight = false;
+        LongPress hold;
     };
 
     class SectionList : public Component, public DragAndDropTarget
@@ -2761,9 +3029,19 @@ namespace kcui
 
         void mouseEnter (const MouseEvent&) override { repaint(); }
         void mouseExit (const MouseEvent&) override  { repaint(); }
-        void mouseDown (const MouseEvent&) override  { down = true; dragged = false; repaint(); }
+        void mouseDown (const MouseEvent& e) override
+        {
+            down = true;
+            dragged = false;
+            repaint();
+            // touch screens: press and hold shares this part of the song as MIDI (a tap mutes it)
+            hold.onLongPress = [this] { down = false; repaint(); page.shareMidi (-1, sm::laneBit (lane)); };
+            hold.mouseDown (e);
+        }
         void mouseDrag (const MouseEvent& e) override
         {
+            hold.mouseDrag (e);
+            if (isTouchUI()) return;
             if (dragged || e.getDistanceFromDragStart() < 6) return;
             dragged = true;
             down = false;
@@ -2774,9 +3052,10 @@ namespace kcui
         }
         void mouseUp (const MouseEvent& e) override
         {
+            hold.mouseUp();
             down = false;
             repaint();
-            if (dragged || ! getLocalBounds().contains (e.getPosition())) return;
+            if (dragged || hold.fired() || ! getLocalBounds().contains (e.getPosition())) return;
             auto& m = lane == sm::Lane::Chords ? page.song.muteChords : (lane == sm::Lane::Bass ? page.song.muteBass : page.song.muteLead);
             m = ! m;
             page.song.changed();
@@ -2786,6 +3065,7 @@ namespace kcui
         SongMapperPage& page;
         sm::Lane lane;
         bool down = false, dragged = false;
+        LongPress hold;
     };
 
     class TimelinePanel : public Component
@@ -2800,6 +3080,7 @@ namespace kcui
             viewport.setViewedComponent (&list, false);
             viewport.setScrollBarsShown (true, false);
             viewport.setScrollBarThickness (10);
+            viewport.setScrollOnDragMode (isTouchUI() ? Viewport::ScrollOnDragMode::all : Viewport::ScrollOnDragMode::nonHover);
             for (Component* c : { (Component*) &viewport, (Component*) &playBtn, (Component*) &stopBtn, (Component*) &loopBtn, (Component*) &linesBtn,
                                   (Component*) &chordsPill, (Component*) &bassPill, (Component*) &leadPill })
                 addAndMakeVisible (c);
@@ -2872,6 +3153,7 @@ namespace kcui
 
         void paint (Graphics& g) override
         {
+            if (page.isMobileLayout()) paintFramedPanel (g, page.assets, getLocalBounds().toFloat(), "SONG STRUCTURE & CHORD TIMELINE");
             loopBtn.lit = page.song.loopPlayback;
             linesBtn.lit = page.song.showLines;
             playBtn.lit = page.isPlaying() && page.playScope == -1;
@@ -2977,8 +3259,12 @@ namespace kcui
         {
             dragStarted = false;
             page.takeFocus();
-            if (e.mods.isPopupMenu()) showMenu();
+            if (e.mods.isPopupMenu()) { showMenu(); return; }
+            hold.onLongPress = [this] { showMenu(); };     // touch screens: press and hold
+            hold.mouseDown (e);
         }
+
+        void mouseUp (const MouseEvent&) override { hold.mouseUp(); }
 
         void mouseDoubleClick (const MouseEvent&) override
         {
@@ -3013,6 +3299,8 @@ namespace kcui
         }
         void mouseDrag (const MouseEvent& e) override
         {
+            hold.mouseDrag (e);
+            if (isTouchUI()) return;         // a swipe scrolls the list on a touch screen (USE and the menu add it)
             if (dragStarted || e.getDistanceFromDragStart() < 6) return;
             dragStarted = true;
             auto d = makeDescription ("progression");
@@ -3028,6 +3316,7 @@ namespace kcui
         bool isFavouriteList;
         KButton playBtn, starBtn, useBtn;
         bool dragStarted = false;
+        LongPress hold;
     };
 
     class BrowserPanel : public Component
@@ -3043,6 +3332,7 @@ namespace kcui
             viewport.setViewedComponent (&content, false);
             viewport.setScrollBarsShown (true, false);
             viewport.setScrollBarThickness (10);
+            viewport.setScrollOnDragMode (isTouchUI() ? Viewport::ScrollOnDragMode::all : Viewport::ScrollOnDragMode::nonHover);
 
             genreBox.fontSize = 22.0f;
             genreBox.setTooltip ("Genre");
@@ -3109,20 +3399,24 @@ namespace kcui
                 for (const auto& p : st.progressions) items.emplace_back (String (p.name), String (p.roman), String (g.name));
             }
             const int w = viewport.getWidth() - viewport.getScrollBarThickness() - 2;
-            int y = 0;
+            const int cols = jmax (1, w / 290), gap = 6;          // a wide panel (tablet, phone on its side) shows two or three across
+            const int cw = (w - gap * (cols - 1)) / cols;
+            int i = 0;
             for (auto& [n, rmn, gn] : items)
             {
                 rows.push_back (std::make_unique<ProgRow> (page, n, rmn, gn, page.song.showFavourites));
                 content.addAndMakeVisible (*rows.back());
-                rows.back()->setBounds (0, y, w, 94);
-                y += 98;
+                rows.back()->setBounds ((i % cols) * (cw + gap), (i / cols) * 98, cw, 94);
+                ++i;
             }
+            const int y = ((i + cols - 1) / cols) * 98;
             content.setSize (w, jmax (y, 10));
             repaint();
         }
 
         void paint (Graphics& g) override
         {
+            if (page.isMobileLayout()) paintFramedPanel (g, page.assets, getLocalBounds().toFloat(), "PROGRESSION BROWSER");
             const auto& gen = genre();
             genreBox.text = page.song.showFavourites ? String (CharPointer_UTF8 ("\xe2\x98\x85 FAVOURITES")) : String (gen.name).toUpperCase();
             styleBox.text = page.song.showFavourites ? String ("ALL") : String (gen.styles[(size_t) jlimit (0, (int) gen.styles.size() - 1, page.song.genreStyle)].name).toUpperCase();
@@ -3227,7 +3521,7 @@ namespace kcui
         void mouseDown (const MouseEvent&) override  { dragStarted = false; }
         void mouseDrag (const MouseEvent& e) override
         {
-            if (dragStarted || e.getDistanceFromDragStart() < 6) return;
+            if (isTouchUI() || dragStarted || e.getDistanceFromDragStart() < 6) return;
             dragStarted = true;
             const auto f = page.midiFile (-1);
             if (f.existsAsFile())
@@ -3421,6 +3715,12 @@ namespace kcui
         //==========================================================================
         void resized() override
         {
+            if (getWidth() < 760)
+            {
+                resizedNarrow();
+                return;
+            }
+            narrow = false;
             frame = getLocalBounds().toFloat().reduced (22.0f);
             auto r = frame.reduced (28.0f, 20.0f).toNearestInt();
             auto row1 = r.removeFromTop (52);
@@ -3450,6 +3750,44 @@ namespace kcui
             prevBtn.setBounds (foot.removeFromRight (48).withSizeKeepingCentre (44, 44));
             hintArea = foot;
             r.removeFromBottom (10);
+            gridArea = r;
+        }
+
+        // a phone: the controls in three short rows above the cards
+        void resizedNarrow()
+        {
+            narrow = true;
+            frame = getLocalBounds().toFloat().reduced (6.0f);
+            auto r = frame.reduced (12.0f, 10.0f).toNearestInt();
+            auto row1 = r.removeFromTop (46);
+            closeBtn.setBounds (row1.removeFromRight (46).withSizeKeepingCentre (44, 44));
+            titleArea = row1;
+            r.removeFromTop (4);
+            auto row2 = r.removeFromTop (42);
+            const int half = (row2.getWidth() - 8) / 2;
+            playBtn.setBounds (row2.removeFromLeft (half * 3 / 5).reduced (0, 2));
+            row2.removeFromLeft (6);
+            loopBtn.setBounds (row2.removeFromLeft (half * 2 / 5).reduced (0, 2));
+            row2.removeFromLeft (8);
+            sourceBox.setBounds (row2);
+            r.removeFromTop (6);
+            auto row3 = r.removeFromTop (42);
+            biggerBtn.setBounds (row3.removeFromRight (42).withSizeKeepingCentre (40, 40));
+            sizeLabel = row3.removeFromRight (50);
+            smallerBtn.setBounds (row3.removeFromRight (42).withSizeKeepingCentre (40, 40));
+            row3.removeFromRight (8);
+            guitarBtn.setBounds (row3.removeFromLeft (jmin (96, row3.getWidth() / 3)).reduced (0, 2));
+            row3.removeFromLeft (4);
+            pianoBtn.setBounds (row3.removeFromLeft (jmin (84, row3.getWidth() / 2)).reduced (0, 2));
+            row3.removeFromLeft (6);
+            voicing.setBounds (row3);
+            r.removeFromTop (10);
+            auto foot = r.removeFromBottom (46);
+            nextBtn.setBounds (foot.removeFromRight (46).withSizeKeepingCentre (44, 44));
+            pageLabel = foot.removeFromRight (70);
+            prevBtn.setBounds (foot.removeFromRight (46).withSizeKeepingCentre (44, 44));
+            hintArea = foot;
+            r.removeFromBottom (6);
             gridArea = r;
         }
 
@@ -3555,8 +3893,8 @@ namespace kcui
             // title
             auto t = titleArea.toFloat();
             g.setColour (panelInk);
-            g.setFont (page.assets.cinzel (32.0f));
-            g.drawText ("CHORD PRACTICE", t.removeFromLeft (360.0f), Justification::centredLeft, false);
+            g.setFont (page.assets.cinzel (narrow ? 24.0f : 32.0f));
+            g.drawText ("CHORD PRACTICE", t.removeFromLeft (narrow ? 250.0f : 360.0f), Justification::centredLeft, false);
             g.setColour (Palette::inkSoft);
             g.setFont (page.assets.baskItalic (19.0f));
             g.drawFittedText ("in " + page.keyText().toLowerCase(), t.toNearestInt(), Justification::centredLeft, 1, 0.8f);
@@ -3609,9 +3947,9 @@ namespace kcui
             g.setColour (Palette::inkSoft);
             g.setFont (page.assets.baskItalic (19.0f));
             const String dot (CharPointer_UTF8 ("  \xc2\xb7  "));
-            String hint = "Click a chord, or one dot or key, to hear it";
-            if (canReorder()) hint += dot + "drag a card to move it";
-            hint += dot + String (CharPointer_UTF8 ("+ / \xe2\x88\x92 size")) + dot + "Esc closes";
+            String hint = isTouchUI() ? "Tap a chord, a dot or a key to hear it" : "Click a chord, or one dot or key, to hear it";
+            if (canReorder()) hint += dot + (isTouchUI() ? "drag a card to move it" : "drag a card to move it");
+            if (! isTouchUI()) hint += dot + String (CharPointer_UTF8 ("+ / \xe2\x88\x92 size")) + dot + "Esc closes";
             g.drawFittedText (hint, hintArea, Justification::centredLeft, 2, 0.8f);
             g.setColour (panelInk);
             g.setFont (page.assets.cinzel (18.0f));
@@ -3802,7 +4140,8 @@ namespace kcui
 
         void mouseDrag (const MouseEvent& e) override
         {
-            if (pressIndex < 0 || ! canReorder() || e.mods.isPopupMenu()) return;
+            hold.mouseDrag (e);
+            if (hold.fired() || pressIndex < 0 || ! canReorder() || e.mods.isPopupMenu()) return;
             if (! dragging)
             {
                 if (e.getDistanceFromDragStart() < 7) return;
@@ -3818,6 +4157,7 @@ namespace kcui
 
         void mouseUp (const MouseEvent&) override
         {
+            hold.mouseUp();
             if (dragging)
             {
                 dragging = false;
@@ -3883,6 +4223,13 @@ namespace kcui
                 pressIndex = first + k;
                 grabOffset = e.position - rects[(size_t) k].getPosition();
                 dragPos = e.position;
+                hold.onLongPress = [this, idx = first + k]
+                {
+                    if (dragging) return;
+                    pressIndex = -1;
+                    showCardMenu (idx);
+                };
+                hold.mouseDown (e);
                 Rectangle<float> mark;
                 bool round = false;
                 const int note = noteAt (layoutFor (rects[(size_t) k], c), c, e.position, mark, round);
@@ -3998,6 +4345,8 @@ namespace kcui
         bool flashRound = false;
         uint32 flashUntil = 0;
         String lastSig;
+        LongPress hold;
+        bool narrow = false;
         // dragging a card
         int pressIndex = -1, dropIndex = -1, edgeDir = 0;
         bool dragging = false;
@@ -4044,7 +4393,9 @@ namespace kcui
                              sm::playStyleDescription (sm::PlayStyle::Strum), sm::playStyleDescription (sm::PlayStyle::Arpeggio) }),
           meterBox (a, { "4/4", "3/4", "6/8" }, { "four beats to a bar", "waltz time", "two swaying beats" }),
           octaveBox (a, { "-2 OCT", "-1 OCT", "NORMAL", "+1 OCT", "+2 OCT" }, 2),
-          lockKey (a, RoundToggle::Icon::Lock)
+          lockKey (a, RoundToggle::Icon::Lock),
+          undoButton (a, String (CharPointer_UTF8 ("\xe2\x86\xb6")), KButton::Look::Round),
+          redoButton (a, String (CharPointer_UTF8 ("\xe2\x86\xb7")), KButton::Look::Round)
     {
         setSize (Layout::designWidth, Layout::designHeight);
         setInterceptsMouseClicks (false, true);
@@ -4075,17 +4426,7 @@ namespace kcui
         octaveBox.setTooltip ("Moves the chords up or down by octaves, in the preview and in the MIDI. The bass and lead rows keep their own notes. Double-click for normal.");
         octaveBox.onChange = [this] (int i) { song.octave = i - 2; song.changed(); };
         lockKey.setTooltip ("Lock Key: keep the Song Mapper in this key. Off, it follows what Key Compass hears, or the key your chords are in");
-        lockKey.onClick = [this]
-        {
-            if (lockKey.getToggleState())
-            {
-                const auto k = currentKey();
-                song.setKeyOverride (k.tonic + (k.minor ? 12 : 0));
-            }
-            else
-                song.setKeyOverride (-1);
-            song.changed();
-        };
+        lockKey.onClick = [this] { setLockKey (lockKey.getToggleState()); };
         clearSong.setTooltip ("Clear Song: removes the chords and the bass and lead notes from every section and keeps the sections (Ctrl+Z brings them back)");
         clearSong.setMouseCursor (MouseCursor::PointingHandCursor);
         clearSong.onClick = [this] { stopPlayback(); song.clearAllChords(); };
@@ -4119,6 +4460,15 @@ namespace kcui
             proc.getAudition().setVolume (song.auditionVolume);
         };
 
+        // phone / tablet layouts: undo and redo either side of the KEY / TEMPO plaque (there is no keyboard)
+        for (auto* b : { &undoButton, &redoButton })
+        {
+            b->fontSize = 26.0f;
+            addChildComponent (*b);
+        }
+        undoButton.onClick = [this] { song.undo(); };
+        redoButton.onClick = [this] { song.redo(); };
+
         song.addChangeListener (this);
         if (! song.tray.empty()) focused = song.tray[(size_t) jmax (0, song.selectedTray)];
         resized();
@@ -4129,9 +4479,71 @@ namespace kcui
         song.removeChangeListener (this);
     }
 
+    void SongMapperPage::setMobileLayout (const MobileLayout& l)
+    {
+        mobile = l;
+        const bool m = mobile.active;
+        // what the painted page carries is not used on a phone: the app has tabs and a settings page instead
+        for (Component* c : { (Component*) backdrop.get(), (Component*) medallion.get(), (Component*) &switchButton, (Component*) &tapButton,
+                              (Component*) &captureButton, (Component*) &songButton, (Component*) &helpButton, (Component*) &volume,
+                              (Component*) &playStyleBox, (Component*) &meterBox, (Component*) &octaveBox, (Component*) &lockKey,
+                              (Component*) &clearSong })
+            c->setVisible (! m);
+        undoButton.setVisible (m && ! mobile.header.isEmpty());
+        redoButton.setVisible (m && ! mobile.header.isEmpty());
+        for (Component* c : { (Component*) header.get(), (Component*) chordPanel.get(), (Component*) timeline.get(), (Component*) browser.get() })
+        {
+            c->setTransform ({});
+            c->setVisible (true);
+        }
+        resized();
+        refreshAll();
+    }
+
+    void SongMapperPage::layoutMobile()
+    {
+        const float s = jmax (0.2f, mobile.scale);
+        auto place = [s] (Component& c, Rectangle<int> area)
+        {
+            c.setVisible (! area.isEmpty());
+            if (area.isEmpty()) return;
+            c.setTransform ({});
+            c.setBounds (0, 0, roundToInt ((float) area.getWidth() / s), roundToInt ((float) area.getHeight() / s));
+            c.setTransform (AffineTransform::scale (s).translated ((float) area.getX(), (float) area.getY()));
+        };
+        place (*chordPanel, mobile.chords);
+        place (*timeline, mobile.timeline);
+        place (*browser, mobile.browser);
+
+        // the KEY / TEMPO plaque keeps its shape, with round undo / redo buttons either side
+        auto h = mobile.header;
+        undoButton.setVisible (! h.isEmpty());
+        redoButton.setVisible (! h.isEmpty());
+        header->setVisible (! h.isEmpty());
+        if (! h.isEmpty())
+        {
+            const int btn = jmin (h.getHeight(), 52);
+            undoButton.setBounds (h.removeFromLeft (btn).withSizeKeepingCentre (btn, btn));
+            redoButton.setBounds (h.removeFromRight (btn).withSizeKeepingCentre (btn, btn));
+            h.reduce (6, 0);
+            const float hs = jmin ((float) h.getWidth() / (float) headerArea.getWidth(), (float) h.getHeight() / (float) headerArea.getHeight());
+            const int w = roundToInt ((float) headerArea.getWidth() * hs), ht = roundToInt ((float) headerArea.getHeight() * hs);
+            header->setTransform ({});
+            header->setBounds (0, 0, headerArea.getWidth(), headerArea.getHeight());
+            header->setTransform (AffineTransform::scale (hs).translated ((float) (h.getCentreX() - w / 2), (float) (h.getCentreY() - ht / 2)));
+        }
+        undoButton.setEnabled (song.canUndo());
+        redoButton.setEnabled (song.canRedo());
+    }
+
     void SongMapperPage::resized()
     {
         if (header == nullptr) return;
+        if (mobile.active)
+        {
+            layoutMobile();
+            return;
+        }
         backdrop->setBounds (getLocalBounds());
         header->setBounds (headerArea);
         chordPanel->setBounds (chordArea);
@@ -4384,8 +4796,106 @@ namespace kcui
                                    laneMask < 0 ? visibleLanes() : laneMask);
     }
 
+    void SongMapperPage::setLockKey (bool lock)
+    {
+        if (lock)
+        {
+            const auto k = currentKey();
+            song.setKeyOverride (k.tonic + (k.minor ? 12 : 0));
+        }
+        else
+            song.setKeyOverride (-1);
+        song.changed();
+    }
+
+    void SongMapperPage::shareMidi (int onlySection, int laneMask)
+    {
+        const auto f = midiFile (onlySection, laneMask);
+        if (! f.existsAsFile()) return;
+        shareBox = ContentSharer::shareFilesScoped ({ URL (f) }, [] (bool, const String&) {}, this);
+    }
+
+    String SongMapperPage::songFileXml() const
+    {
+        ValueTree root ("KeyCompassSong");
+        root.setProperty ("version", KC_VERSION_STRING, nullptr);
+        root.appendChild (song.toValueTree(), nullptr);
+        return root.toXmlString();
+    }
+
+    File SongMapperPage::songFileFor (const String& name) const
+    {
+        auto safe = File::createLegalFileName (name.trim()).trim();
+        if (safe.isEmpty()) safe = "Song";
+        return File::getSpecialLocation (File::tempDirectory).getChildFile ("KeyCompass").getChildFile (safe + ".kcsong");
+    }
+
+    void SongMapperPage::shareSongFile()
+    {
+        auto f = songFileFor (song.songName);
+        f.getParentDirectory().createDirectory();
+        if (! f.replaceWithText (songFileXml())) return;
+        shareBox = ContentSharer::shareFilesScoped ({ URL (f) }, [] (bool, const String&) {}, this);
+    }
+
+    void SongMapperPage::saveSongFile()
+    {
+        if (isTouchUI()) { shareSongFile(); return; }
+        const auto start = File::getSpecialLocation (File::userDocumentsDirectory).getChildFile (songFileFor (song.songName).getFileName());
+        chooser = std::make_unique<FileChooser> ("Save the song (to open it in Key Compass on another computer or phone)", start, "*.kcsong");
+        chooser->launchAsync (FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::warnAboutOverwriting,
+                              [safe = SafePointer<SongMapperPage> (this)] (const FileChooser& fc)
+                              {
+                                  if (safe == nullptr) return;
+                                  auto dest = fc.getResult();
+                                  if (dest == File()) return;
+                                  if (! dest.hasFileExtension ("kcsong")) dest = dest.withFileExtension ("kcsong");
+                                  dest.replaceWithText (safe->songFileXml());
+                              });
+    }
+
+    void SongMapperPage::openSongFile()
+    {
+        // on Android the picker hands back a content:// address, so the file is read through its URL
+        chooser = std::make_unique<FileChooser> ("Open a Key Compass song",
+                                                 File::getSpecialLocation (File::userDocumentsDirectory),
+                                                 isTouchUI() ? String ("*") : String ("*.kcsong"));
+        chooser->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
+                              [safe = SafePointer<SongMapperPage> (this)] (const FileChooser& fc)
+                              {
+                                  if (safe == nullptr) return;
+                                  const auto url = fc.getURLResult();
+                                  if (url.isEmpty()) return;
+                                  String text;
+                                  if (url.isLocalFile())
+                                      text = url.getLocalFile().loadFileAsString();
+                                  else if (auto in = url.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)))
+                                      text = in->readEntireStreamAsString();
+                                  if (! safe->loadSongXml (text))
+                                      AlertWindow::showMessageBoxAsync (MessageBoxIconType::NoIcon, "Open song",
+                                                                        "That file isn't a Key Compass song (.kcsong).");
+                              });
+    }
+
+    bool SongMapperPage::loadSongXml (const String& text)
+    {
+        const auto xml = parseXML (text);
+        if (xml == nullptr) return false;
+        const auto tree = ValueTree::fromXml (*xml);
+        const auto map = tree.hasType ("SongMap") ? tree : tree.getChildWithName ("SongMap");
+        if (! map.isValid()) return false;
+        stopPlayback();
+        closePractice();
+        song.checkpoint();                 // Undo brings back the sections and chords you had before
+        song.fromValueTree (map);
+        focused = song.tray.empty() ? sm::Chord() : song.tray[(size_t) jlimit (0, (int) song.tray.size() - 1, song.selectedTray)];
+        song.changed();
+        return true;
+    }
+
     void SongMapperPage::exportMidi (int onlySection)
     {
+        if (isTouchUI()) { shareMidi (onlySection); return; }
         const auto src = midiFile (onlySection);
         chooser = std::make_unique<FileChooser> ("Save MIDI file", File::getSpecialLocation (File::userDocumentsDirectory).getChildFile (src.getFileName()), "*.mid");
         chooser->launchAsync (FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::warnAboutOverwriting,
@@ -4466,13 +4976,17 @@ namespace kcui
         templates.addItem (19, "Empty song");
         m.addSubMenu ("New song from a template", templates);
         m.addItem (3, String (CharPointer_UTF8 ("Rename song\xe2\x80\xa6  (")) + song.songName + ")");
-        m.addItem (4, String (CharPointer_UTF8 ("Save MIDI file\xe2\x80\xa6")));
-        m.addItem (6, "Open the manual  (F1)");
+        m.addItem (4, String (CharPointer_UTF8 (isTouchUI() ? "Share the song as MIDI\xe2\x80\xa6" : "Save MIDI file\xe2\x80\xa6")));
+        m.addItem (7, String (CharPointer_UTF8 (isTouchUI() ? "Share the song file\xe2\x80\xa6  (open it on your PC)"
+                                                            : "Save song file\xe2\x80\xa6  (open it on your phone)")));
+        m.addItem (8, String (CharPointer_UTF8 ("Open a song file\xe2\x80\xa6")));
+        m.addItem (6, isTouchUI() ? "Open the manual" : "Open the manual  (F1)");
         m.addSeparator();
         m.addItem (5, "Clear the progression", ! song.tray.empty());
-        m.addSectionHeader (cmd + "+Z undoes, " + cmd + "+Shift+Z redoes");
+        if (! isTouchUI()) m.addSectionHeader (cmd + "+Z undoes, " + cmd + "+Shift+Z redoes");
         m.addSectionHeader (versionText());
-        m.showMenuAsync (PopupMenu::Options().withTargetScreenArea (songButton.getScreenBounds()).withStandardItemHeight (menuItemHeight()),
+        auto target = songButton.isShowing() ? songButton.getScreenBounds() : Rectangle<int> (Desktop::getMousePosition(), Desktop::getMousePosition()).expanded (2);
+        m.showMenuAsync (PopupMenu::Options().withTargetScreenArea (target).withStandardItemHeight (menuItemHeight()),
                          [this, safe = SafePointer<SongMapperPage> (this)] (int r)
                          {
                              if (safe == nullptr || r == 0) return;
@@ -4482,6 +4996,8 @@ namespace kcui
                              if (r == 4) { exportMidi (-1); return; }
                              if (r == 5) { song.clearTray(); return; }
                              if (r == 6) { openManual(); return; }
+                             if (r == 7) { saveSongFile(); return; }
+                             if (r == 8) { openSongFile(); return; }
                              std::vector<std::pair<String, int>> t;
                              if (r == 11) t = { { "Intro", 4 }, { "Verse", 8 }, { "Pre-Chorus", 4 }, { "Chorus", 8 }, { "Verse", 8 }, { "Pre-Chorus", 4 }, { "Chorus", 8 }, { "Bridge", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
                              if (r == 12) t = { { "Intro", 4 }, { "Verse", 8 }, { "Chorus", 8 }, { "Verse", 8 }, { "Chorus", 8 }, { "Solo", 8 }, { "Chorus", 8 }, { "Outro", 4 } };
@@ -4570,8 +5086,12 @@ namespace kcui
         if (practice == nullptr) practice = std::make_unique<PracticeView> (*this);
         // above everything on the page, including the shared plates the editor owns
         auto* host = getParentComponent() != nullptr ? getParentComponent() : this;
+        if (practiceHost) if (auto* h = practiceHost()) host = h;
         host->addAndMakeVisible (*practice);
-        practice->setBounds (host == this ? getLocalBounds() : getBounds());
+        if (practiceHost && host != this && host != getParentComponent())
+            practice->setBounds (host->getLocalBounds());       // the app sizes it to fit the screen (see MobileEditor)
+        else
+            practice->setBounds (host == this ? getLocalBounds() : getBounds());
         practice->setSource (source);
         practice->toFront (true);
         practice->grabKeyboardFocus();
@@ -4608,6 +5128,8 @@ namespace kcui
     void SongMapperPage::changeListenerCallback (ChangeBroadcaster*)
     {
         syncControls();
+        undoButton.setEnabled (song.canUndo());
+        redoButton.setEnabled (song.canRedo());
         if (song.selectedTray >= 0 && song.selectedTray < (int) song.tray.size() && ! focused.isValid())
             focused = song.tray[(size_t) song.selectedTray];
         volume.setValue (song.auditionVolume, dontSendNotification);

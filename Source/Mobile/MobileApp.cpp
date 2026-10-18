@@ -33,6 +33,8 @@ public:
         loadState();
 
         window = std::make_unique<MainWindow> (*processor, commandLine);
+        if (auto* ed = editor())
+            ed->onRequestMicrophone = [this] { askForMicrophoneAgain(); };
         startAudio();
         startTimer (20000);      // autosave: Android can close a background app without warning
     }
@@ -64,14 +66,39 @@ public:
 
     bool backButtonPressed() override
     {
-        // close whatever is open on top (the practice view, a sheet) before leaving the app
-        if (window != nullptr)
-            if (auto* ed = dynamic_cast<MobileEditor*> (window->getContentComponent()))
-                return ed->handleBackButton();
+        // close whatever is open on top (the practice view, a menu, another tab) before leaving the app
+        if (auto* ed = editor())
+            return ed->handleBackButton();
         return false;
     }
 
 private:
+    MobileEditor* editor() const
+    {
+        return window != nullptr ? dynamic_cast<MobileEditor*> (window->getContentComponent()) : nullptr;
+    }
+
+    void askForMicrophoneAgain()
+    {
+        juce::RuntimePermissions::request (juce::RuntimePermissions::recordAudio, [this] (bool granted)
+        {
+            if (granted)
+            {
+                micAllowed = true;
+                auto setup = deviceManager.getAudioDeviceSetup();
+                setup.useDefaultInputChannels = true;
+                deviceManager.setAudioDeviceSetup (setup, true);
+                if (auto* ed = editor()) ed->setMicrophoneAllowed (true);
+                return;
+            }
+            // Android stops asking after the second "Don't allow"; then only Settings can turn it on
+            juce::AlertWindow::showMessageBoxAsync (juce::MessageBoxIconType::NoIcon, "Microphone",
+                "Key Compass listens through the microphone to find the key and chords.\n\n"
+                "To allow it: open your phone's Settings > Apps > Key Compass > Permissions > Microphone > Allow.\n\n"
+                "A MIDI keyboard plugged into the phone works without it.");
+        });
+    }
+
     //==============================================================================
     class MainWindow : public juce::DocumentWindow
     {
@@ -135,9 +162,8 @@ private:
             player.setProcessor (processor.get());
             deviceManager.addAudioCallback (&player);
             enableMidiInputs();
-            if (window != nullptr)
-                if (auto* ed = dynamic_cast<MobileEditor*> (window->getContentComponent()))
-                    ed->setMicrophoneAllowed (granted);
+            if (auto* ed = editor())
+                ed->setMicrophoneAllowed (granted);
         });
     }
 

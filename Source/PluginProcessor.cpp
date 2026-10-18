@@ -147,6 +147,7 @@ void KeyCompassProcessor::getStateInformation (juce::MemoryBlock& destData)
     state.setProperty ("savedConfidence", snap.confidence, nullptr);
     state.setProperty ("mapperScale", mapperScale.load(), nullptr);
     state.setProperty ("editorPage", editorPage.load(), nullptr);
+    state.setProperty ("mobileTab", mobileTab.load(), nullptr);
 
     // The song lives on the message thread; hosts usually ask for state there too.
     juce::ValueTree song;
@@ -180,6 +181,7 @@ void KeyCompassProcessor::setStateInformation (const void* data, int sizeInBytes
             const float ms = (float) (double) tree.getProperty ("mapperScale", 0.0);
             mapperScale.store (ms > 0.0f ? juce::jlimit (0.35f, 1.2f, ms) : 0.0f);
             editorPage.store (juce::jlimit (0, 1, (int) tree.getProperty ("editorPage", 0)));
+            mobileTab.store (juce::jlimit (0, 4, (int) tree.getProperty ("mobileTab", 0)));
 
             if (song.isValid())
             {

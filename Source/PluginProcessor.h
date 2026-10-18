@@ -53,6 +53,8 @@ public:
     void setMapperScale (float s) noexcept               { mapperScale.store (s); }
     int getEditorPage() const noexcept                   { return editorPage.load(); }
     void setEditorPage (int p) noexcept                  { editorPage.store (p); }
+    int getMobileTab() const noexcept                    { return mobileTab.load(); }   // the Android app's tab
+    void setMobileTab (int t) noexcept                   { mobileTab.store (t); }
 
     // Song Mapper
     sm::SongMap& getSongMap() noexcept                   { return songMap; }
@@ -98,6 +100,7 @@ private:
     std::vector<float> monoBuffer;
     std::atomic<float> editorScale { 0.0f }, mapperScale { 0.0f };    // window size per page; 0 = choose automatically
     std::atomic<int> editorPage { 0 };                                  // 0 = compass, 1 = song mapper
+    std::atomic<int> mobileTab { 0 };                                   // Android app: 0 compass, 1 chords, 2 song, 3 library, 4 more
 
     sm::SongMap songMap;
     sm::AuditionEngine audition;

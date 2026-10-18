@@ -15,6 +15,15 @@ namespace kcui
         face       = juce::ImageCache::getFromMemory (BinaryData::face_jpg, BinaryData::face_jpgSize);
         mapperBackground = juce::ImageCache::getFromMemory (BinaryData::mapper_bg_jpg, BinaryData::mapper_bg_jpgSize);
         plaque     = juce::ImageCache::getFromMemory (BinaryData::plaque_png, BinaryData::plaque_pngSize);
+
+        auto named = [] (const char* name)
+        {
+            int size = 0;
+            const char* data = BinaryData::getNamedResource (name, size);
+            return data != nullptr && size > 0 ? juce::ImageCache::getFromMemory (data, size) : juce::Image();
+        };
+        mobilePanel = named ("panel_jpg");
+        mobileMap   = named ("map_jpg");
     }
 
     bool& touchUIFlag() noexcept

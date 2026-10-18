@@ -62,6 +62,26 @@ namespace kcui
     void drawKeyboard (juce::Graphics&, juce::Rectangle<float> area, const std::vector<int>& notes, int lowNote, int numWhite,
                        float scale = 1.0f);
 
+    // Phone / tablet layouts: the brass-framed parchment panel drawn at any size, with a title on its scroll
+    // (on the desktop the panels are part of the painted page)
+    void paintFramedPanel (juce::Graphics&, Assets&, juce::Rectangle<float> r, const juce::String& title);
+
+    // Press and hold on a touch screen stands in for the right mouse button (the menus)
+    class LongPress : private juce::Timer
+    {
+    public:
+        std::function<void()> onLongPress;
+        void mouseDown (const juce::MouseEvent&);      // starts the clock (touch screens only)
+        void mouseDrag (const juce::MouseEvent&);      // moving the finger cancels it
+        void mouseUp()                 { stopTimer(); }
+        void cancel()                  { stopTimer(); }
+        bool fired() const noexcept    { return didFire; }   // since the last press
+        static constexpr int holdMs = 430;
+    private:
+        void timerCallback() override;
+        bool didFire = false;
+    };
+
     //==============================================================================
     class HeaderView;
     class ChordPanel;
@@ -82,6 +102,31 @@ namespace kcui
         void visibilityChanged() override;
 
         std::function<void()> onSwitchToCompass;
+
+        // ---- phone / tablet layouts (the Android app) ----
+        // Each panel is shown on its own at 'scale' (dp per design pixel) in the given area of this page;
+        // the page's painted backdrop, plaques and plates are hidden (the app has its own tabs and settings).
+        struct MobileLayout
+        {
+            bool active = false;
+            float scale = 1.0f;
+            juce::Rectangle<int> header, chords, timeline, browser;   // empty = not shown
+        };
+        void setMobileLayout (const MobileLayout&);
+        bool isMobileLayout() const noexcept                { return mobile.active; }
+        const MobileLayout& getMobileLayout() const noexcept { return mobile; }
+        std::function<juce::Component*()> practiceHost;      // the component the practice view covers (the app's screen)
+        std::function<void()> onBeforeMenu;                    // e.g. hide the on-screen keyboard
+
+        // ---- sharing (touch screens) and song files (everywhere) ----
+        void shareMidi (int onlySection, int laneMask = -1);  // the share sheet (Drive, Gmail, Files...)
+        void shareSongFile();
+        void saveSongFile();                                   // desktop: a save dialog
+        void openSongFile();
+        bool loadSongXml (const juce::String& xmlText);        // false if it isn't a Key Compass song
+        juce::String songFileXml() const;
+        void setLockKey (bool lock);
+        void showSongMenu();
 
         // ---- shared state & helpers for the panels ----
         KeyCompassProcessor& proc;
@@ -155,7 +200,8 @@ namespace kcui
     private:
         void changeListenerCallback (juce::ChangeBroadcaster*) override;
         void timerCallback() override;
-        void showSongMenu();
+        void layoutMobile();
+        juce::File songFileFor (const juce::String& name) const;
 
         std::unique_ptr<MapperBackdrop> backdrop;
         std::unique_ptr<HeaderView> header;
@@ -165,6 +211,9 @@ namespace kcui
         std::unique_ptr<DragMedallion> medallion;
         std::unique_ptr<PracticeView> practice;
         KButton switchButton, tapButton, captureButton, songButton, helpButton;
+        KButton undoButton, redoButton;                // phone / tablet layouts: either side of the KEY / TEMPO plaque
+        MobileLayout mobile;
+        juce::ScopedMessageBox shareBox;
         // the shared control plates at the bottom, with Song Mapper settings in them
         PlainChoiceBox playStyleBox, meterBox;
         PlainStepper octaveBox;
