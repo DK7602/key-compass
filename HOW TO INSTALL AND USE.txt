@@ -1,0 +1,226 @@
+KEY COMPASS - key, chord and note finder + Song Mapper (VST3 plug-in + standalone app)
+======================================================================================
+
+INSTALL (one time, about 10 minutes)
+------------------------------------
+You need: Visual Studio (Community is free) with "Desktop development with C++".
+Git is optional (without it, JUCE is downloaded as a zip).
+To give Key Compass to a friend, don't send this folder - see SHARING below.
+
+1. Right-click the downloaded zip > Properties > tick "Unblock" (if you see it) > OK.
+   Then right-click > Extract All... and extract it somewhere simple,
+   for example  C:\KeyCompass
+2. Open the extracted folder and double-click   Build and Install.bat
+   - If a blue "Windows protected your PC" box appears: click "More info" > "Run anyway".
+   - It downloads the JUCE framework, builds the plug-in and installs it.
+   - Near the end Windows asks for permission to copy into Program Files: click "Yes".
+3. When it says "All done!", press any key to close the window.
+
+The plug-in is installed to:  C:\Program Files\Common Files\VST3\Key Compass.vst3
+A copy (and the standalone app "Key Compass.exe") is in the "Output" folder,
+and there is a "Key Compass" shortcut on your desktop for the standalone app.
+
+If Visual Studio says the C++ tools are missing: open "Visual Studio Installer" >
+Modify > tick "Desktop development with C++" > Modify, then run the .bat again.
+
+
+SHARING WITH A FRIEND
+---------------------
+Double-click   Make Shareable Package.bat   (after Build and Install.bat has run).
+It makes "Key Compass Shareable.zip" next to it: the finished plug-in and app, a
+manual, and a one-click installer. Your friend needs no build tools - they extract
+the zip and double-click "Install Key Compass.bat" (its READ ME FIRST.txt explains).
+If you changed the source since the last build, it offers to build first.
+Send it with Google Drive, Dropbox, OneDrive or WeTransfer (email often blocks zips
+with an app inside). It works on 64-bit Windows 10/11; it is not code-signed, so
+Windows may say "Windows protected your PC" - More info > Run anyway.
+"Uninstall Key Compass.bat" in the package removes it again.
+
+
+USE IN CUBASE (or any DAW that loads VST3)
+------------------------------------------
+Start Cubase (it scans new plug-ins at start-up; if Key Compass is missing use
+Studio > VST Plug-in Manager > Rescan). Key Compass is listed under "Analyzer".
+It never changes your sound - it only listens.
+
+  TRACK mode  Put it as an insert on one instrument (guitar, piano, synth, sample...).
+              Shows the live chord, the notes being played and the key.
+  MONO mode   Put it on a vocal, bass or lead line. Shows the note with its octave,
+              how many cents sharp/flat it is, and the key of the melody.
+  SONG mode   Put it on the Stereo Out (master) to find the key of the whole song.
+
+MIDI (most accurate): in Cubase, set a MIDI or instrument track's MIDI output
+(Output Routing) to "Key Compass". The plate then says MIDI and reads the exact notes.
+
+Press Play. The compass needle swings to the key's home note, the gold wedge shows
+the 7 notes that belong to the key, and letters light up as notes are played
+(red = a note outside the key). When you stop, the last reading stays on screen.
+
+
+WHAT EVERYTHING MEANS
+---------------------
+DETECTED KEY   The key. "or A major" underneath means the music also fits that key
+               (usually the relative major/minor - same notes, different home).
+CONFIDENCE     How clearly the winner beats the other keys. Blue = confident,
+               orange/red = still unsure (play more of the song).
+KEY FAMILY     The six main chords of the key. The chord playing now glows blue.
+CHORDS         Recent chords, newest on the right. A blue diamond marks a key change.
+               (In MONO mode this shows recent NOTES.)
+MODE           Track / Mono / Song (see above).
+RESPONSE       Fast = follows key changes quickly. Steady = waits for more music.
+TUNING A4      Reference pitch (normally 440 Hz). Click the arrows, drag up/down,
+               or scroll. Shift = 0.1 Hz steps. Double-click = back to 440.
+LOCK KEY       Freezes the key; chords and notes keep updating.
+FLATS          Shows Bb/Eb instead of A#/D#.
+CLEAR HISTORY  Clears the chord list and starts listening for the key again.
+
+The window opens as large as comfortably fits your screen. Resize it by dragging
+the bottom-right corner, or right-click the background for size presets. The size
+you choose is remembered (separately for the compass and the Song Mapper). Hover over any control for a short explanation.
+
+
+MANUAL
+------
+The full manual is built in: click MANUAL (top-right of the compass), or the "?"
+next to the porthole in Song Mapper, or press F1 there. It opens as a PDF.
+"Key Compass Manual.pdf" is also in this folder.
+
+SONG MAPPER (second page)
+-------------------------
+Click SONG MAPPER (top-left of the compass) to open it, and KEY COMPASS to go back.
+The window gets bigger for this page; both pages remember their own size.
+The preview sound is a recorded acoustic guitar (or a piano, with PIANO picked);
+bass rows play a recorded electric bass.
+
+KEY / TEMPO     Top centre. The key follows what Key Compass hears or, with nothing
+                coming in, the key your chords are in (the line under it says which;
+                Key Compass never hears the Song Mapper's own sound). Click it to pick
+                a key yourself. The tempo follows your DAW; drag it up/down, scroll it,
+                or press TAP TEMPO. Click the line under the tempo for 4/4, 3/4 or 6/8.
+CHORD DIAGRAMS  Left. Click any chord anywhere and it shows here (and plays).
+                GUITAR or PIANO, and VOICING: Standard, Open/Easy, Triad, Barre,
+                Power Chord, Shell, Inversion, Color/Extended.
+                Click a dot, an open string or a piano key to hear just that note;
+                click the chord name to hear the whole chord.
+PRACTICE VIEW   The round button with four arrows (top-right of the diagram)
+                opens the chords big, to learn them by hand. Also: right-click a
+                progression card or a section name > Practice.
+                  Top-left box   the progression, one song section, or just the
+                                 chord you picked
+                  GUITAR / PIANO and the voicing box, as in the small diagram
+                  - SIZE +       fewer, bigger diagrams per page (or press + / -)
+                  PLAY / LOOP    plays them; the chord sounding glows blue and
+                                 the pages turn on their own, so you can play along
+                Guitar dots show which finger to use (1 index ... 4 little); the
+                note on each string is written underneath. Click a chord, a dot or
+                a key to hear it. Arrow keys turn pages, Esc closes.
+                Rearrange: drag a card to a new place (hold it over the page arrows
+                to go to another page), or click a card and press Shift+Left/Right,
+                or right-click it > Move. This changes the progression or the song
+                section itself; Ctrl+Z undoes it. If they are playing, they carry
+                on in the new order.
+PROGRESSION     The 8 cards under the diagram are your working progression. Add chords
+                by typing one (e.g. F#m7, Bbmaj9, D/F#) and pressing Enter, with
+                KEY CHORDS, or the + card. Drag cards to reorder them. PLAY plays them,
+                SAVE stores them in your favourites, ADD ALL TO "..." puts them into
+                the selected song section. CAPTURE CHORDS copies the chords Key Compass
+                just heard.
+BROWSER         Right. Pick a GENRE and STYLE (or the star for your favourites).
+                Every progression is shown in your key. Play to preview, star to
+                favourite, USE to load it into the progression, or drag it onto a section.
+TIMELINE        Middle. Each section (Intro, Verse 1, Chorus 1...) has, under its name:
+                  4 BARS      how many bars it is in your DAW
+                  1 BAR EACH  how long each chord lasts (chords repeat to fill the
+                              section; SPREAD OUT shares the bars between the chords)
+                and play, drag-to-DAW (arrow) and delete buttons next to the name.
+                Drag chords between sections, drag a section's name to reorder it,
+                double-click a name to rename it, right-click for more.
+                "+ add a section" at the bottom of the list adds one. PLAY SONG plays
+                every section that has something in it (empty ones are skipped, so
+                LOOP loops what you have written). LINES shows or hides all the bass
+                and lead rows.
+BASS & LEAD     Under a section's chords, click "+ bass line" or "+ lead line" to give
+                that section its own row (or right-click the section name). Each row
+                is a small piano roll. Its rows are the notes of your key (plus any chord
+                note from outside the key, named in blue), and the gold rows are the
+                notes of the chord playing above, so what you place fits.
+                  Click          add a note and hear it (hold Alt for 16ths)
+                  Drag           move a note; drag its right end to change its length
+                  Double-click   delete it (or select it and press Delete)
+                  Up / Down      next row up / down; Shift+Up/Down = sharp / flat
+                                 (notes outside the key turn red)
+                  Right-click    play, length, sharpen, flatten, octave up/down, delete
+                  LOOP           how long the pattern is before it repeats: 1, 2, 4 or
+                                 8 bars, or the whole section
+                  FILL (bass)    write a bass line from the chords: Roots (held), Root
+                                 pulse (8ths), Root and fifth, Octaves, Walking. Then
+                                 change any note you like.
+                  The two arrows above the note names move the rows up/down an octave.
+                  The arrow button drags just this row of this section to your DAW;
+                  x hides the row (its notes are kept).
+                You can edit while the song plays and hear the change straight away.
+                While LINES is off, only the chords are played and dragged.
+PARTS           The three pills under the timeline - CHORDS, BASS, LEAD. Click one to
+                mute that part when you play the song (preview only). Drag one onto a
+                track in your DAW to drop that part of the whole song.
+DRAG TO DAW     Drag the round DRAG SONG TO DAW porthole (top-right) onto a MIDI or
+                instrument track in Cubase: the whole song lands as MIDI with the
+                section lengths you set, plus section markers. Drag a section's arrow
+                button to drop just that section. If the song has bass or lead rows,
+                the file has one MIDI track per part (chords, bass, lead) and most DAWs
+                make a track for each; to put one part on a track you already have,
+                drag its pill or the row's own arrow instead. Click the porthole to save
+                a .mid file.
+SONG menu       Undo / redo (also Ctrl+Z / Ctrl+Shift+Z), new song from a template,
+                rename the song (the name of the MIDI part), save a MIDI file.
+BOTTOM PLATES   On this page the six controls at the bottom change job:
+                  PLAY STYLE  how chords play, in the preview AND in the MIDI:
+                              Block (held), Pulse (8ths), Strum (down-up), Arpeggio
+                  TIME SIG.   4/4, 3/4 or 6/8
+                  OCTAVE      move the chords up or down, in the preview and the MIDI
+                              (the bass and lead rows keep their own notes)
+                  LOCK KEY    keep the Song Mapper in this key (stop following what is
+                              heard or the key of your chords)
+                  FLATS       same as on the compass
+                  CLEAR SONG  empties every section, chords and notes (Ctrl+Z brings
+                              it back)
+                The compass keeps its own Mode, Response and Tuning settings.
+
+The preview sound plays through the track Key Compass is on (in the standalone app,
+through your speakers). VOL under the porthole sets its level. Your song is saved
+with the Cubase project; favourites are shared by every project.
+
+
+STANDALONE APP
+--------------
+"Key Compass" on your desktop runs without a DAW and listens to your microphone or
+audio interface input (sing or play into it). Click "Options" at the top of the
+window to choose the input device or a MIDI keyboard.
+
+
+TROUBLESHOOTING
+---------------
+- The build failed: open build-log.txt in this folder; the error is near the bottom.
+- "Could not copy the plug-in": close Cubase and run Build and Install.bat again.
+- Song Mapper bass or lead sounds out of tune against the chords: the KEY at the top
+  doesn't match the chords. Turn LOCK KEY off (it then follows your chords) or pick
+  the right key, then move any red notes onto the gold rows.
+- Cubase still shows the old version (the standalone app updated but the plug-in did
+  not): Cubase was open, so the old plug-in file could not be replaced. Close Cubase
+  completely and run Build and Install.bat again, clicking Yes when Windows asks.
+  Or copy "Output\Key Compass.vst3" into C:\Program Files\Common Files\VST3 yourself,
+  replacing the old one. To check which version Cubase is running, right-click the
+  background of Key Compass: the bottom of the menu shows the version and build date.
+- To rebuild from scratch: delete the "build" folder and run the .bat again.
+- No preview sound in Cubase: the sound comes out of the track Key Compass is on, so
+  that track must be playing to an output you can hear (not muted, fader up).
+- PLAY SONG skips a section: sections with no chords or notes are skipped while
+  previewing. They still count in the MIDI you drag into Cubase.
+- Dragging to Cubase does nothing: drop onto a MIDI or instrument track (or below the
+  last track to make a new one). Or click the porthole and import the saved .mid file.
+
+Built with the JUCE framework (juce.com, AGPLv3 / JUCE licence). Fonts: renamed, modified
+versions of Cinzel and Libre Baskerville (SIL Open Font License, see Resources\fonts).
+Guitar and bass sounds: recordings from tonejs-instruments by Nicholaus P. Brosowsky
+(CC BY 3.0) - acoustic guitar from the University of Iowa Electronic Music Studios,
+electric bass from Karoryfer Samples; trimmed and re-encoded (see Resources\samples).

@@ -1,0 +1,54 @@
+KEY COMPASS  (version @VERSION@)
+================================
+A key, chord and note finder with a Song Mapper for building chord progressions,
+as a VST3 plug-in (Cubase and most other DAWs) and a standalone app.
+Windows 10 or 11, 64-bit.
+
+
+INSTALL (about a minute)
+------------------------
+1. Right-click "Key Compass Shareable.zip" > Properties. If there is an "Unblock"
+   box at the bottom, tick it and click OK.
+2. Right-click the zip > Extract All... > Extract.
+3. In the extracted folder, double-click   Install Key Compass.bat
+   - If a blue "Windows protected your PC" box appears, click "More info", then
+     "Run anyway". (Key Compass is not from an app store, so Windows asks first.)
+   - When Windows asks for permission to change Program Files, click "Yes".
+4. When it says "All done!", press any key to close the window.
+
+That's it. The plug-in is in  C:\Program Files\Common Files\VST3\Key Compass.vst3
+and the app is on your Desktop and in the Start menu as "Key Compass".
+
+
+USING IT
+--------
+In Cubase: open (or restart) Cubase and add Key Compass as an insert effect on a
+track - it is listed under "Analyzer". If it is not there:
+Studio > VST Plug-in Manager > Rescan. Other DAWs: rescan your VST3 plug-ins.
+
+Key Compass only listens - it never changes your sound.
+  TRACK mode  on an instrument: shows the chord, the notes and the key.
+  MONO mode   on a vocal, bass or lead: shows the note and how in tune it is.
+  SONG mode   on the master output: finds the key of the whole song.
+
+SONG MAPPER (the plaque at the top-left) is the second page: browse chord
+progressions in your key, see guitar and piano diagrams (the four-arrow button
+makes them big for practising), lay out a song, add bass and lead lines, and drag
+the result into your DAW as MIDI.
+
+The full manual is built in: click MANUAL at the top-right of Key Compass, or open
+"Key Compass Manual.pdf" in this folder.
+
+
+UPDATING / REMOVING
+-------------------
+To update to a newer version: close your DAW, then run the new
+"Install Key Compass.bat". To remove it: run "Uninstall Key Compass.bat".
+
+
+CREDITS
+-------
+Guitar and bass recordings from tonejs-instruments by Nicholaus P. Brosowsky
+(CC BY 3.0): acoustic guitar from the University of Iowa Electronic Music Studios,
+electric bass from Karoryfer Samples. Fonts: Cinzel and Libre Baskerville (SIL Open
+Font License). Built with JUCE.
