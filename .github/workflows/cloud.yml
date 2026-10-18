@@ -43,7 +43,7 @@ jobs:
           account=$(printf '%s' "$ACCOUNT" | LC_ALL=C tr -cd 'A-Za-z0-9')
           removed=$(( $(printf '%s' "$TOKEN" | LC_ALL=C wc -c) - ${#token} ))
           prefix=no; case "$token" in cf*_*) prefix=yes ;; esac
-          echo "Token: ${#token} characters kept, $removed removed (spaces, line breaks, invisible characters); starts like a Cloudflare token: $prefix"
+          echo "::notice::Token: ${#token} characters kept, $removed removed (spaces, line breaks, invisible characters); starts like a Cloudflare token: $prefix"
           echo "::add-mask::$token"
           echo "::add-mask::$account"
           if ! printf '%s' "$account" | grep -Eq '^[0-9a-fA-F]{32}$'; then
