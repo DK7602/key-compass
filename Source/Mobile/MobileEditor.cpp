@@ -59,9 +59,9 @@ public:
         return { i * w, 0, i == n - 1 ? r.getWidth() - i * w : w, r.getHeight() };
     }
 
-    int itemIndexFor (int tab) const
+    int itemIndexFor (int t) const
     {
-        for (int i = 0; i < (int) items.size(); ++i) if (items[(size_t) i].tab == tab) return i;
+        for (int i = 0; i < (int) items.size(); ++i) if (items[(size_t) i].tab == t) return i;
         return -1;
     }
 
@@ -93,11 +93,11 @@ public:
                 g.setColour (Palette::gold.withAlpha (0.85f));
                 g.drawRoundedRectangle (b.reduced (1.0f), 10.0f, 1.4f);
             }
-            auto iconArea = b.withTrimmedBottom (b.getHeight() * 0.38f);
-            const float sz = jmin (iconArea.getWidth(), iconArea.getHeight()) * 0.72f;
+            auto iconArea = b.withTrimmedBottom (b.getHeight() * 0.38f).withTrimmedTop (b.getHeight() * 0.06f);
+            const float sz = jmin (iconArea.getWidth(), iconArea.getHeight()) * 0.74f;
             drawIcon (g, it.tab, it.label, iconArea.withSizeKeepingCentre (sz, sz), on ? Palette::goldLight : Palette::goldDim);
             g.setColour (on ? Palette::goldLight : Palette::cream.withAlpha (0.72f));
-            Font f = assets.cinzel (jmin (14.5f, b.getHeight() * 0.22f));
+            Font f = assets.cinzel (jmin (15.0f, b.getHeight() * 0.27f));
             while (textWidth (f, it.label) > b.getWidth() - 4.0f && f.getHeight() > 8.0f) f = f.withHeight (f.getHeight() - 0.5f);
             g.setFont (f);
             g.drawText (it.label, b.withTop (b.getBottom() - b.getHeight() * 0.38f).translated (0.0f, -1.0f), Justification::centred, false);
@@ -204,7 +204,7 @@ private:
 class MobileEditor::CompassView : public Component
 {
 public:
-    CompassView (Assets& a, const UiState& s) : assets (a), bgA (a), bgB (a), dial (a, s), lid (a, s)
+    CompassView (Assets& a, const UiState& s) : bgA (a), bgB (a), dial (a, s), lid (a, s)
     {
         setInterceptsMouseClicks (false, true);
         for (auto* w : { &winA, &winB })
@@ -287,7 +287,6 @@ private:
     {
     public:
         MicButton() : Button ("mic") {}
-        Assets* assets = nullptr;
         void paintButton (Graphics& g, bool highlighted, bool down) override
         {
             auto r = getLocalBounds().toFloat().reduced (1.0f);
@@ -301,7 +300,6 @@ private:
         }
     };
 
-    Assets& assets;
     Component winA, winB, stageA, stageB;
     StaticLayer bgA, bgB;
     DialLayer dial;
@@ -333,13 +331,12 @@ public:
     void resized() override
     {
         auto r = getLocalBounds().reduced (8, 5);
-        const int h = r.getHeight();
-        const int round = jmin (h, 50);
-        clearButton.setBounds (r.removeFromRight (jmin (110, r.getWidth() / 4)).reduced (0, 3));
-        r.removeFromRight (8);
-        modeBox.setBounds (r.removeFromLeft (jmin (150, r.getWidth() * 2 / 5)).reduced (0, 1));
-        r.removeFromLeft (8);
-        // lock and flats, each with a label beside it
+        const int round = jmin (r.getHeight(), 46);
+        clearButton.setBounds (r.removeFromRight (jmin (104, r.getWidth() / 4)).reduced (0, 2));
+        r.removeFromRight (6);
+        modeBox.setBounds (r.removeFromLeft (jmin (140, r.getWidth() * 3 / 8)).reduced (0, 1));
+        r.removeFromLeft (6);
+        // lock and flats, each with its name beside it
         const int each = r.getWidth() / 2;
         lockArea = r.removeFromLeft (each);
         flatsArea = r;
@@ -352,8 +349,8 @@ public:
         paintEnamelPlate (g, getLocalBounds().toFloat().reduced (2.0f), 12.0f);
         g.setColour (Palette::goldLight.withAlpha (0.9f));
         g.setFont (assets.cinzel (13.0f));
-        g.drawFittedText ("LOCK\nKEY", lockArea.reduced (4, 0), Justification::centredLeft, 2, 0.8f);
-        g.drawFittedText ("FLATS", flatsArea.reduced (4, 0), Justification::centredLeft, 1, 0.8f);
+        g.drawFittedText ("LOCK", lockArea.withTrimmedLeft (4), Justification::centredLeft, 1, 0.6f);
+        g.drawFittedText ("FLATS", flatsArea.withTrimmedLeft (4), Justification::centredLeft, 1, 0.6f);
     }
 
 private:
@@ -500,7 +497,8 @@ private:
 
         heading ("SONG MAPPER");
         pair (tapButton, captureButton);
-        full (songButton);
+        songButton.setBounds ((w - jmin (w, 240)) / 2, y, jmin (w, 240), rowH - 4);
+        y += rowH + 2;
         row ("PLAY STYLE", playStyleBox);
         row ("TIME SIG.", meterBox);
         row ("OCTAVE", octaveBox);
@@ -623,6 +621,11 @@ MobileEditor::MobileEditor (KeyCompassProcessor& p)
     addAndMakeVisible (practiceLayer);
 
     tab = jlimit (0, (int) numTabs - 1, p.getMobileTab());
+    // MANUAL buttons, F1 and the menus all end up here
+    manualOpener() = [safe = SafePointer<MobileEditor> (this)] (const File& f)
+    {
+        return safe != nullptr && safe->showManual (f);
+    };
     resized();
     tick (0.0f);
     startTimerHz (30);
@@ -631,6 +634,8 @@ MobileEditor::MobileEditor (KeyCompassProcessor& p)
 MobileEditor::~MobileEditor()
 {
     stopTimer();
+    manualOpener() = nullptr;
+    manual.reset();
     processor.getAudition().stop();
     canvas.mapper.closePractice();
     canvas.mapper.practiceHost = nullptr;
@@ -644,6 +649,31 @@ juce::Component* MobileEditor::findTabButton (int t)
 }
 
 juce::Component& MobileEditor::getMoreSheet() { return *more; }
+
+bool MobileEditor::showManual (const File& pdf)
+{
+    if (auto r = ManualViewer::openPdf (pdf))
+    {
+        showManualWith (std::move (r));
+        return true;
+    }
+    // can't draw it here: hand the PDF to another app (a PDF reader, Drive...)
+    shareBox = ContentSharer::shareFilesScoped ({ URL (pdf) }, [] (bool, const String&) {}, this);
+    return true;
+}
+
+void MobileEditor::showManualWith (std::unique_ptr<ManualViewer::Renderer> r)
+{
+    manual = std::make_unique<ManualViewer> (*assets, std::move (r));
+    manual->onClose = [safe = SafePointer<MobileEditor> (this)]
+    {
+        // it closes from inside its own button: delete it afterwards
+        MessageManager::callAsync ([safe] { if (safe != nullptr) safe->manual.reset(); });
+    };
+    practiceLayer.addAndMakeVisible (*manual);
+    manual->setBounds (practiceLayer.getLocalBounds());
+    manual->toFront (true);
+}
 
 void MobileEditor::setSimulatedInsets (BorderSize<int> safe, int keyboard)
 {
@@ -720,7 +750,6 @@ void MobileEditor::showTab (int t)
 void MobileEditor::paint (Graphics& g)
 {
     g.fillAll (Colours::black);
-    if (layout == Layout::Classic) return;
     // the old map behind everything, darkened so the panels stand out
     const auto& map = assets->mobileMap;
     if (map.isValid())
@@ -788,7 +817,7 @@ void MobileEditor::layoutTouch (Rectangle<int> area, bool sideways)
                                   : content.removeFromBottom (jmin (70, area.getHeight() / 11 + 6));
 
     // how many of the Song Mapper's panels fit side by side at a readable size
-    const int headerH = sideways ? jlimit (44, 64, content.getHeight() / 8) : jlimit (60, 86, content.getHeight() / 10);
+    const int headerH = sideways ? jlimit (52, 72, content.getHeight() / 6) : jlimit (60, 86, content.getHeight() / 10);
     auto mapperArea = content.withTrimmedTop (headerH);
     const float W = (float) mapperArea.getWidth() - 8.0f, H = (float) mapperArea.getHeight() - 6.0f;
     const float s3 = jmin ((W - 2.0f * panelGap) / (float) (chordW + timelineW + browserW), H / 610.0f);
@@ -816,7 +845,8 @@ void MobileEditor::layoutTouch (Rectangle<int> area, bool sideways)
         const int stripH = jlimit (50, 62, c.getHeight() / 12);
         strip->setBounds (c.removeFromBottom (stripH).withSizeKeepingCentre (jmin (c.getWidth(), 560), stripH));
         c.removeFromBottom (6);
-        compass->layoutIn (c, sideways);
+        compass->setBounds (c);
+        compass->layoutIn (c.withZeroOrigin(), sideways);
         compass->setMicNoteVisible (! micAllowed);
     }
 
@@ -842,7 +872,11 @@ void MobileEditor::layoutTouch (Rectangle<int> area, bool sideways)
         ml.active = true;
         const auto local = content.withZeroOrigin();
         ml.header = local.withHeight (headerH).withSizeKeepingCentre (jmin (local.getWidth(), 560), headerH).reduced (4, 3);
-        auto r = local.withTrimmedTop (headerH).reduced (4, 3);
+        // on its side every bit of height counts: the KEY / TEMPO plaque sits over the panels' top edge,
+        // where their titles are, as it does over the timeline on the desktop page
+        const int overlap = sideways ? jmin (headerH / 2, 30) : 0;
+        auto r = local.withTrimmedTop (headerH - overlap).reduced (4, 3);
+        ml.hideTitles = overlap > 0;
         const float rw = (float) r.getWidth(), rh = (float) r.getHeight();
         if (panes == 3)
         {
@@ -870,7 +904,7 @@ void MobileEditor::layoutTouch (Rectangle<int> area, bool sideways)
                 s = jmin (1.25f, rw / 620.0f, rh / 395.0f);
             ml.scale = jmax (0.6f, s);
             if (shown == chordsTab)       ml.chords = r;
-            else if (shown == songTab)    ml.timeline = r;
+            else if (shown == songTab)    { ml.timeline = r; ml.scale = jmax (0.6f, jmin (ml.scale, rw / 395.0f)); }   // a little wider for the rolls
             else                          ml.browser = r;
         }
         page.setMobileLayout (ml);
@@ -882,6 +916,7 @@ bool MobileEditor::handleBackButton()
 {
     auto& page = canvas.mapper;
     if (PopupMenu::dismissAllActiveMenus()) return true;
+    if (manual != nullptr) { manual.reset(); return true; }
     if (page.isPracticeOpen()) { page.closePractice(); return true; }
     if (layout == Layout::Classic)
     {

@@ -32,7 +32,7 @@ jobs:
       # minutes to build, so it is kept between runs.
       - name: Projucer (cached)
         id: projucer
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: tools/Projucer
           key: projucer-${{ env.JUCE_VERSION }}-ubuntu-24.04-v1
@@ -47,6 +47,13 @@ jobs:
           cmake --build build-projucer --target Projucer
           mkdir -p tools
           cp build-projucer/extras/Projucer/Projucer_artefacts/Release/Projucer tools/
+
+      - name: Keep the Projucer for next time
+        if: steps.projucer.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: tools/Projucer
+          key: projucer-${{ env.JUCE_VERSION }}-ubuntu-24.04-v1
 
       - name: Write the Android Studio project
         run: |

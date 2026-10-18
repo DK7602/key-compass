@@ -117,7 +117,7 @@ if (KC_LINUX_TEST)
 
     # the Android app's screens, drawn at phone and tablet sizes (Tests/MobileShots.cpp)
     juce_add_console_app (KeyCompassMobileShots PRODUCT_NAME "KeyCompassMobileShots")
-    target_sources (KeyCompassMobileShots PRIVATE Tests/MobileShots.cpp Source/Mobile/MobileEditor.cpp ${KC_SOURCES})
+    target_sources (KeyCompassMobileShots PRIVATE Tests/MobileShots.cpp Source/Mobile/MobileEditor.cpp Source/Mobile/ManualViewer.cpp ${KC_SOURCES})
     target_compile_definitions (KeyCompassMobileShots PRIVATE ${KC_DEFINITIONS}
         KC_MOBILE=1 JucePlugin_Build_Standalone=0 JUCE_STANDALONE_APPLICATION=1 JUCE_MODAL_LOOPS_PERMITTED=1)
     target_link_libraries (KeyCompassMobileShots PRIVATE

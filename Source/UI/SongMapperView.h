@@ -111,6 +111,7 @@ namespace kcui
             bool active = false;
             float scale = 1.0f;
             juce::Rectangle<int> header, chords, timeline, browser;   // empty = not shown
+            bool hideTitles = false;                                   // the header sits over the panels' title scrolls
         };
         void setMobileLayout (const MobileLayout&);
         bool isMobileLayout() const noexcept                { return mobile.active; }

@@ -1203,7 +1203,7 @@ namespace kcui
 
         void paint (Graphics& g) override
         {
-            if (page.isMobileLayout()) paintFramedPanel (g, page.assets, getLocalBounds().toFloat(), "CHORD DIAGRAMS");
+            if (page.isMobileLayout()) paintFramedPanel (g, page.assets, getLocalBounds().toFloat(), page.getMobileLayout().hideTitles ? String() : String ("CHORD DIAGRAMS"));
             guitarBtn.lit = page.song.guitar;
             pianoBtn.lit = ! page.song.guitar;
             voicing.text = shortStyleName (page.song.guitar || page.song.style != sm::GuitarStyle::Barre ? page.song.style : sm::GuitarStyle::Standard, page.song.guitar);
@@ -3018,7 +3018,7 @@ namespace kcui
             const String name = lane == sm::Lane::Chords ? "CHORDS" : (lane == sm::Lane::Bass ? "BASS" : "LEAD");
             g.setColour (lit ? enamelText : enamelText.withAlpha (0.45f));
             g.setFont (page.assets.cinzel (18.0f));
-            g.drawFittedText (name, r.withTrimmedLeft (24.0f).withTrimmedRight (22.0f).toNearestInt(), Justification::centred, 1, 0.8f);
+            g.drawFittedText (name, r.withTrimmedLeft (24.0f).withTrimmedRight (22.0f).toNearestInt(), Justification::centred, 1, 0.6f);
             if (off)
             {
                 g.setColour (Colour (0xffd0583c).withAlpha (0.85f));
@@ -3153,7 +3153,7 @@ namespace kcui
 
         void paint (Graphics& g) override
         {
-            if (page.isMobileLayout()) paintFramedPanel (g, page.assets, getLocalBounds().toFloat(), "SONG STRUCTURE & CHORD TIMELINE");
+            if (page.isMobileLayout()) paintFramedPanel (g, page.assets, getLocalBounds().toFloat(), page.getMobileLayout().hideTitles ? String() : String ("SONG STRUCTURE & CHORD TIMELINE"));
             loopBtn.lit = page.song.loopPlayback;
             linesBtn.lit = page.song.showLines;
             playBtn.lit = page.isPlaying() && page.playScope == -1;
@@ -3416,7 +3416,7 @@ namespace kcui
 
         void paint (Graphics& g) override
         {
-            if (page.isMobileLayout()) paintFramedPanel (g, page.assets, getLocalBounds().toFloat(), "PROGRESSION BROWSER");
+            if (page.isMobileLayout()) paintFramedPanel (g, page.assets, getLocalBounds().toFloat(), page.getMobileLayout().hideTitles ? String() : String ("PROGRESSION BROWSER"));
             const auto& gen = genre();
             genreBox.text = page.song.showFavourites ? String (CharPointer_UTF8 ("\xe2\x98\x85 FAVOURITES")) : String (gen.name).toUpperCase();
             styleBox.text = page.song.showFavourites ? String ("ALL") : String (gen.styles[(size_t) jlimit (0, (int) gen.styles.size() - 1, page.song.genreStyle)].name).toUpperCase();
@@ -3715,6 +3715,11 @@ namespace kcui
         //==========================================================================
         void resized() override
         {
+            if (getHeight() < 520 && getWidth() > getHeight())
+            {
+                resizedShort();
+                return;
+            }
             if (getWidth() < 760)
             {
                 resizedNarrow();
@@ -3753,7 +3758,7 @@ namespace kcui
             gridArea = r;
         }
 
-        // a phone: the controls in three short rows above the cards
+        // a phone held upright: the controls in rows above the cards, size and pages below them
         void resizedNarrow()
         {
             narrow = true;
@@ -3764,30 +3769,65 @@ namespace kcui
             titleArea = row1;
             r.removeFromTop (4);
             auto row2 = r.removeFromTop (42);
-            const int half = (row2.getWidth() - 8) / 2;
-            playBtn.setBounds (row2.removeFromLeft (half * 3 / 5).reduced (0, 2));
+            const int third = (row2.getWidth() - 12) / 3;
+            playBtn.setBounds (row2.removeFromLeft (third).reduced (0, 2));
             row2.removeFromLeft (6);
-            loopBtn.setBounds (row2.removeFromLeft (half * 2 / 5).reduced (0, 2));
-            row2.removeFromLeft (8);
+            loopBtn.setBounds (row2.removeFromLeft (third * 3 / 4).reduced (0, 2));
+            row2.removeFromLeft (6);
             sourceBox.setBounds (row2);
             r.removeFromTop (6);
             auto row3 = r.removeFromTop (42);
-            biggerBtn.setBounds (row3.removeFromRight (42).withSizeKeepingCentre (40, 40));
-            sizeLabel = row3.removeFromRight (50);
-            smallerBtn.setBounds (row3.removeFromRight (42).withSizeKeepingCentre (40, 40));
-            row3.removeFromRight (8);
-            guitarBtn.setBounds (row3.removeFromLeft (jmin (96, row3.getWidth() / 3)).reduced (0, 2));
+            guitarBtn.setBounds (row3.removeFromLeft (row3.getWidth() * 3 / 10).reduced (0, 2));
             row3.removeFromLeft (4);
-            pianoBtn.setBounds (row3.removeFromLeft (jmin (84, row3.getWidth() / 2)).reduced (0, 2));
+            pianoBtn.setBounds (row3.removeFromLeft (row3.getWidth() * 4 / 10).reduced (0, 2));
             row3.removeFromLeft (6);
             voicing.setBounds (row3);
             r.removeFromTop (10);
             auto foot = r.removeFromBottom (46);
+            smallerBtn.setBounds (foot.removeFromLeft (46).withSizeKeepingCentre (42, 42));
+            sizeLabel = foot.removeFromLeft (54);
+            biggerBtn.setBounds (foot.removeFromLeft (46).withSizeKeepingCentre (42, 42));
             nextBtn.setBounds (foot.removeFromRight (46).withSizeKeepingCentre (44, 44));
-            pageLabel = foot.removeFromRight (70);
+            pageLabel = foot.removeFromRight (64);
             prevBtn.setBounds (foot.removeFromRight (46).withSizeKeepingCentre (44, 44));
-            hintArea = foot;
-            r.removeFromBottom (6);
+            r.removeFromBottom (2);
+            hintArea = r.removeFromBottom (38);
+            r.removeFromBottom (4);
+            gridArea = r;
+        }
+
+        // a phone on its side: the controls in a column on the left, the cards fill the rest
+        void resizedShort()
+        {
+            narrow = true;
+            frame = getLocalBounds().toFloat().reduced (6.0f);
+            auto r = frame.reduced (12.0f, 8.0f).toNearestInt();
+            auto col = r.removeFromLeft (jlimit (200, 260, r.getWidth() / 4));
+            r.removeFromLeft (12);
+            const int rowH = jlimit (34, 44, (col.getHeight() - 12) / 8);
+            auto row1 = col.removeFromTop (rowH + 4);
+            closeBtn.setBounds (row1.removeFromRight (44).withSizeKeepingCentre (rowH, rowH));
+            titleArea = row1;
+            auto line = [&] { col.removeFromTop (4); return col.removeFromTop (rowH); };
+            auto row2 = line();
+            playBtn.setBounds (row2.removeFromLeft (row2.getWidth() * 6 / 10).reduced (0, 1));
+            row2.removeFromLeft (6);
+            loopBtn.setBounds (row2.reduced (0, 1));
+            sourceBox.setBounds (line());
+            auto row4 = line();
+            guitarBtn.setBounds (row4.removeFromLeft (row4.getWidth() / 2 - 3).reduced (0, 1));
+            row4.removeFromLeft (6);
+            pianoBtn.setBounds (row4.reduced (0, 1));
+            voicing.setBounds (line());
+            auto row6 = line();
+            smallerBtn.setBounds (row6.removeFromLeft (rowH + 2).withSizeKeepingCentre (rowH, rowH));
+            biggerBtn.setBounds (row6.removeFromRight (rowH + 2).withSizeKeepingCentre (rowH, rowH));
+            sizeLabel = row6;
+            auto row7 = line();
+            prevBtn.setBounds (row7.removeFromLeft (rowH + 2).withSizeKeepingCentre (rowH, rowH));
+            nextBtn.setBounds (row7.removeFromRight (rowH + 2).withSizeKeepingCentre (rowH, rowH));
+            pageLabel = row7;
+            hintArea = col.reduced (0, 4);
             gridArea = r;
         }
 
@@ -3893,11 +3933,17 @@ namespace kcui
             // title
             auto t = titleArea.toFloat();
             g.setColour (panelInk);
-            g.setFont (page.assets.cinzel (narrow ? 24.0f : 32.0f));
-            g.drawText ("CHORD PRACTICE", t.removeFromLeft (narrow ? 250.0f : 360.0f), Justification::centredLeft, false);
+            {
+                Font tf = page.assets.cinzel (narrow ? 24.0f : 32.0f);
+                while (textWidth (tf, "CHORD PRACTICE") > t.getWidth() - 4.0f && tf.getHeight() > 12.0f) tf = tf.withHeight (tf.getHeight() - 1.0f);
+                g.setFont (tf);
+                const float tw = textWidth (tf, "CHORD PRACTICE") + 12.0f;
+                g.drawText ("CHORD PRACTICE", t.removeFromLeft (narrow ? tw : 360.0f), Justification::centredLeft, false);
+            }
             g.setColour (Palette::inkSoft);
             g.setFont (page.assets.baskItalic (19.0f));
-            g.drawFittedText ("in " + page.keyText().toLowerCase(), t.toNearestInt(), Justification::centredLeft, 1, 0.8f);
+            if (t.getWidth() > 60.0f)
+                g.drawFittedText ("in " + page.keyText().toLowerCase(), t.toNearestInt(), Justification::centredLeft, 1, 0.8f);
 
             const auto all = chords();
             const int first = pageIndex * perPage();
@@ -3950,7 +3996,7 @@ namespace kcui
             String hint = isTouchUI() ? "Tap a chord, a dot or a key to hear it" : "Click a chord, or one dot or key, to hear it";
             if (canReorder()) hint += dot + (isTouchUI() ? "drag a card to move it" : "drag a card to move it");
             if (! isTouchUI()) hint += dot + String (CharPointer_UTF8 ("+ / \xe2\x88\x92 size")) + dot + "Esc closes";
-            g.drawFittedText (hint, hintArea, Justification::centredLeft, 2, 0.8f);
+            g.drawFittedText (hint, hintArea, narrow ? Justification::centred : Justification::centredLeft, narrow ? 4 : 2, 0.8f);
             g.setColour (panelInk);
             g.setFont (page.assets.cinzel (18.0f));
             g.drawText ("SIZE", sizeLabel.toFloat(), Justification::centred, false);
@@ -4532,6 +4578,9 @@ namespace kcui
             header->setBounds (0, 0, headerArea.getWidth(), headerArea.getHeight());
             header->setTransform (AffineTransform::scale (hs).translated ((float) (h.getCentreX() - w / 2), (float) (h.getCentreY() - ht / 2)));
         }
+        header->toFront (false);
+        undoButton.toFront (false);
+        redoButton.toFront (false);
         undoButton.setEnabled (song.canUndo());
         redoButton.setEnabled (song.canRedo());
     }

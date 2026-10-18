@@ -6,6 +6,7 @@
 #pragma once
 
 #include "../PluginEditor.h"
+#include "ManualViewer.h"
 
 class MobileEditor : public juce::Component, public juce::DragAndDropContainer, private juce::Timer
 {
@@ -28,6 +29,11 @@ public:
     void setMicrophoneAllowed (bool allowed);
     std::function<void()> onRequestMicrophone;    // the app asks Android for the microphone again
     void tick (float seconds);                    // for tests: advance the animation without waiting
+
+    // the manual, drawn page by page over everything (Android's PDF renderer); false = it can't be shown here
+    bool showManual (const juce::File& pdf);
+    void showManualWith (std::unique_ptr<ManualViewer::Renderer>);
+    bool isManualOpen() const noexcept            { return manual != nullptr; }
 
     // tests: pretend the status / navigation bars and the on-screen keyboard take this much room
     void setSimulatedInsets (juce::BorderSize<int> safeArea, int keyboard = 0);
@@ -60,7 +66,9 @@ private:
     std::unique_ptr<CompassView> compass;
     std::unique_ptr<CompassStrip> strip;
     std::unique_ptr<MoreSheet> more;
-    juce::Component practiceLayer;                // the practice view covers the screen (inside the bars)
+    juce::Component practiceLayer;                // the practice view and the manual cover the screen (inside the bars)
+    std::unique_ptr<ManualViewer> manual;
+    juce::ScopedMessageBox shareBox;
 
     Layout layout = Layout::Phone;
     int tab = compassTab, panes = 1;

@@ -30,7 +30,7 @@ w('<!-- Key Compass for Android - written by Android/make_jucer.py (edit that, n
   '     re-saves it with the Projucer into Android/Builds/Android and builds it with Gradle. JUCE goes in ../JUCE. -->\n')
 w(f'<JUCERPROJECT id="KcMob1" name="Key Compass" projectType="guiapp" version="{version}" bundleIdentifier="com.keycompass.app"\n'
   '              companyName="Key Compass" cppLanguageStandard="17" jucerFormatVersion="1"\n'
-  '              defines="KC_MOBILE=1" addUsingNamespaceToJuceHeader="0" useAppConfig="1" maxBinaryFileSize="4194304">\n')
+  '              defines="KC_MOBILE=1" addUsingNamespaceToJuceHeader="0" useAppConfig="0" maxBinaryFileSize="4194304">\n')
 w('  <MAINGROUP id="KcMain" name="Key Compass">\n')
 w('    <GROUP id="KcSrc" name="Source">\n')
 for i, f in enumerate(src):
