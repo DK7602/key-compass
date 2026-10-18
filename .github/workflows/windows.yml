@@ -1,0 +1,70 @@
+# Builds the PC version (VST3 plug-in + standalone app) on Windows with Microsoft's compiler - the same
+# script as "Build and Install.bat", without installing - and puts the one-click install package
+# (KeyCompass-Windows.zip, made by "Make Shareable Package.bat") on the release page beside the phone app.
+name: Windows app
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ 'cloud/**', '.github/workflows/cloud.yml', '.github/workflows/android.yml', 'Android/**',
+                    'Source/Mobile/**', 'Scripts/android-smoke-test.sh', 'Scripts/mobile/**', '**.md' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write          # to publish the zip on the release page
+
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Get JUCE 8.0.15
+        run: git clone --depth 1 --branch 8.0.15 https://github.com/juce-framework/JUCE.git JUCE
+
+      - name: Build (Scripts/build.ps1, without installing)
+        shell: pwsh
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File Scripts/build.ps1 -NoInstall
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Report the errors
+        if: failure()
+        shell: pwsh
+        run: |
+          if (Test-Path build-log.txt) {
+            Select-String -Path build-log.txt -Pattern ': error |: fatal error |FAILED|LINK : |error LNK' |
+              Select-Object -First 40 | ForEach-Object { Write-Output ("::error::" + ($_.Line -replace '%', '%25')) }
+          }
+
+      - name: Make the install package
+        shell: pwsh
+        run: |
+          powershell.exe -NoProfile -ExecutionPolicy Bypass -File Scripts/make-shareable.ps1
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          Copy-Item "Key Compass Shareable.zip" KeyCompass-Windows.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KeyCompass-Windows
+          path: KeyCompass-Windows.zip
+
+      - name: Publish on the release page
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="android-latest"      # one release page for both: KeyCompass.apk and KeyCompass-Windows.zip
+          version=$(sed -n 's/^project *( *KeyCompass  *VERSION  *\([0-9.]*\).*/\1/p' CMakeLists.txt | head -1)
+          sed "s/@VERSION@/$version/g" Scripts/release-notes.md > notes.md
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release edit "$tag" --title "Key Compass $version" --notes-file notes.md
+          else
+            gh release create "$tag" --target "$GITHUB_SHA" --title "Key Compass $version" --notes-file notes.md --latest
+          fi
+          gh release upload "$tag" KeyCompass-Windows.zip --clobber

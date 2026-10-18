@@ -3885,6 +3885,7 @@ namespace kcui
             GuitarGeometry geo;
             float scale = 1.0f;
             int low = 48, whites = 14;      // keyboard
+            bool sideBySide = false;        // piano: the long name left of the chord name, the notes right of it
         };
 
         CardLayout layoutFor (Rectangle<float> r, const sm::Chord& c) const
@@ -3892,6 +3893,29 @@ namespace kcui
             CardLayout L;
             auto inner = r.reduced (jmax (10.0f, r.getWidth() * (page.song.guitar ? 0.06f : 0.04f)), jmax (8.0f, r.getHeight() * 0.035f));
             const float nameH = jlimit (36.0f, 78.0f, r.getHeight() * 0.12f);
+
+            if (! page.song.guitar)
+            {
+                // one line of writing (long name - CHORD - notes), so the keyboard gets the rest of the card
+                Font nf = page.assets.bask (nameH * 0.95f);
+                const float nameW = jmin (textWidth (nf, page.chordText (c)) + 20.0f, inner.getWidth() * 0.5f);
+                const float sideW = (inner.getWidth() - nameW) * 0.5f;
+                if (sideW >= 96.0f)
+                {
+                    L.sideBySide = true;
+                    auto top = inner.removeFromTop (nameH);
+                    L.longName = top.removeFromLeft (sideW).withTrimmedRight (6.0f);
+                    L.notes = top.removeFromRight (sideW).withTrimmedLeft (6.0f);
+                    L.name = top;
+                    inner.removeFromTop (jmax (6.0f, inner.getHeight() * 0.05f));
+                    keyboardSpan (L.low, L.whites);
+                    const float h = jmin (inner.getHeight(), inner.getWidth() / (float) L.whites * 5.5f);
+                    L.diagram = inner.withSizeKeepingCentre (inner.getWidth(), h);
+                    L.scale = h / 102.0f;
+                    return L;
+                }
+            }
+
             L.name = inner.removeFromTop (nameH);
             L.longName = inner.removeFromTop (jmax (20.0f, nameH * 0.48f));
             L.notes = inner.removeFromBottom (jlimit (24.0f, 46.0f, nameH * 0.6f));
@@ -4052,10 +4076,19 @@ namespace kcui
                 if (v.shown.isValid() && v.shown.quality != c.quality) sub += "  - plays " + page.chordText (v.shown);
             }
             g.setColour (Palette::inkSoft);
-            g.setFont (page.assets.baskItalic (jmax (17.0f, L.longName.getHeight() * 0.78f)));
-            g.drawFittedText (sub, L.longName.toNearestInt(), Justification::centred, 1, 0.7f);
+            const float sideFont = jlimit (17.0f, 28.0f, L.name.getHeight() * 0.42f);
+            if (L.sideBySide)
+            {
+                g.setFont (page.assets.baskItalic (sideFont));
+                g.drawFittedText (sub, L.longName.toNearestInt(), Justification::centred, 2, 0.75f);
+            }
+            else
+            {
+                g.setFont (page.assets.baskItalic (jmax (17.0f, L.longName.getHeight() * 0.78f)));
+                g.drawFittedText (sub, L.longName.toNearestInt(), Justification::centred, 1, 0.7f);
+            }
 
-            const float noteFont = jlimit (17.0f, 30.0f, L.notes.getHeight() * 0.72f);
+            const float noteFont = L.sideBySide ? sideFont : jlimit (17.0f, 30.0f, L.notes.getHeight() * 0.72f);
             if (page.song.guitar)
             {
                 const auto v = sm::guitarVoicing (c, page.song.style);
@@ -4080,7 +4113,8 @@ namespace kcui
                 for (int nn : notes) names.add (utf8 (sm::pcName (nn % 12, page.useFlats())) + String (nn / 12 - 1));
                 g.setColour (panelInk);
                 g.setFont (page.assets.baskItalic (noteFont));
-                g.drawFittedText (names.joinIntoString ("   "), L.notes.toNearestInt(), Justification::centred, 1, 0.7f);
+                g.drawFittedText (names.joinIntoString (L.sideBySide ? "  " : "   "), L.notes.toNearestInt(), Justification::centred,
+                                  L.sideBySide ? 2 : 1, 0.75f);
             }
         }
 

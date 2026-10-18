@@ -440,6 +440,8 @@ int main (int argc, char* argv[])
         { "phone_settings",  412, 915, phoneBars, T::moreTab, {} },
         { "phone_practice",  412, 915, phoneBars, T::chordsTab, [] (MobileEditor& e) { e.getMapper().showPractice (-2); } },
         { "phone_piano",     412, 915, phoneBars, T::chordsTab, [&proc] (MobileEditor&) { proc.getSongMap().guitar = false; proc.getSongMap().changed(); } },
+        { "phone_practice_piano", 412, 915, phoneBars, T::chordsTab, [&proc] (MobileEditor& e)
+            { proc.getSongMap().guitar = false; proc.getSongMap().changed(); pump (100); e.getMapper().showPractice (-2); } },
         { "phone_manual",    412, 915, phoneBars, T::moreTab, [] (MobileEditor& e) { e.showManualWith (std::make_unique<FakePdf>()); pump (600); } },
         { "phone_typing",    412, 915, phoneBars, T::chordsTab, [] (MobileEditor& e)
             {
@@ -455,6 +457,8 @@ int main (int argc, char* argv[])
         { "side_song",       915, 412, sideBars, T::songTab, {} },
         { "side_library",    915, 412, sideBars, T::libraryTab, {} },
         { "side_practice",   915, 412, sideBars, T::chordsTab, [] (MobileEditor& e) { e.getMapper().showPractice (-2); } },
+        { "tablet_practice_piano", 800, 1280, tabletBars, T::chordsTab, [&proc] (MobileEditor& e)
+            { proc.getSongMap().guitar = false; proc.getSongMap().changed(); pump (100); e.getMapper().showPractice (-2); } },
         { "tablet_compass",  800, 1280, tabletBars, T::compassTab, {} },
         { "tablet_mapper",   800, 1280, tabletBars, T::songTab, {} },
         { "tabletside_compass", 1280, 800, tabletBars, T::compassTab, {} },

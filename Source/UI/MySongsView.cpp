@@ -176,9 +176,11 @@ namespace kcui
             PopupMenu m;
             m.addItem (1, "Turn off on this device  (your songs stay here and in the cloud)");
             m.addItem (2, "Turn off and delete the songs in the cloud  (they stay on this device)");
+            // made out here: inside a lambda, MSVC reads 'this' in a nested lambda's capture list as the outer lambda
+            SafePointer<MySongsView> safe (this);
             showMenu (m, getLookAndFeel(), PopupMenu::Options().withTargetScreenArea (turnOffButton.getScreenBounds())
                                                                .withStandardItemHeight (menuItemHeight()),
-                      [this, finished, safe = SafePointer<MySongsView> (this)] (int r)
+                      [this, finished, safe] (int r)
                       {
                           if (safe == nullptr || r == 0) return;
                           if (r == 1)

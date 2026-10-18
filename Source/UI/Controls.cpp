@@ -298,7 +298,7 @@ namespace kcui
             menu.showMenuAsync (options, std::move (onResult));
             return;
         }
-        constexpr int firstSubMenu = 0x7f000000;
+        static constexpr int firstSubMenu = 0x7f000000;     // static: the callback below can use it without capturing it (MSVC)
         PopupMenu flat;
         flat.setLookAndFeel (&lookAndFeel);
         std::vector<PopupMenu> subMenus;

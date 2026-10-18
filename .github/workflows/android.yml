@@ -167,18 +167,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.apk.outputs.version }}
         run: |
-          tag="android-latest"
-          notes="Key Compass ${VERSION} for Android phones and tablets (Android 8 or newer).
-          Built $(date -u '+%Y-%m-%d %H:%M UTC') from ${GITHUB_SHA::7}.
-
-          To install: open this page on your phone, tap KeyCompass.apk, then Open. The first time, Android asks you to
-          allow installs from your browser - allow it, then tap Install."
+          tag="android-latest"      # one release page for both: KeyCompass.apk and KeyCompass-Windows.zip (windows.yml)
+          sed "s/@VERSION@/$VERSION/g" Scripts/release-notes.md > notes.md
           # the tag stays where it is: GitHub won't let a build move a tag onto a commit that changes workflow files,
-          # and the release page (with the newest .apk) is what matters
+          # and the release page (with the newest files) is what matters
           if gh release view "$tag" > /dev/null 2>&1; then
-            gh release edit "$tag" --title "Key Compass ${VERSION} for Android" --notes "$notes" --latest
+            gh release edit "$tag" --title "Key Compass ${VERSION}" --notes-file notes.md --latest
           else
-            gh release create "$tag" --target "$GITHUB_SHA" --title "Key Compass ${VERSION} for Android" --notes "$notes" --latest
+            gh release create "$tag" --target "$GITHUB_SHA" --title "Key Compass ${VERSION}" --notes-file notes.md --latest
           fi
           gh release upload "$tag" dist/KeyCompass.apk --clobber
 
