@@ -282,6 +282,43 @@ namespace kcui
         g.strokePath (chevron, PathStrokeType (3.4f, PathStrokeType::curved, PathStrokeType::rounded));
     }
 
+    void showMenu (PopupMenu& menu, LookAndFeel& lookAndFeel, const PopupMenu::Options& options,
+                   std::function<void (int)> onResult)
+    {
+        menu.setLookAndFeel (&lookAndFeel);
+        if (! isTouchUI())
+        {
+            menu.showMenuAsync (options, std::move (onResult));
+            return;
+        }
+        constexpr int firstSubMenu = 0x7f000000;
+        PopupMenu flat;
+        flat.setLookAndFeel (&lookAndFeel);
+        std::vector<PopupMenu> subMenus;
+        for (PopupMenu::MenuItemIterator it (menu, false); it.next();)
+        {
+            PopupMenu::Item item (it.getItem());
+            if (item.subMenu != nullptr)
+            {
+                subMenus.push_back (*item.subMenu);
+                item.subMenu.reset();
+                item.itemID = firstSubMenu + (int) subMenus.size() - 1;
+                item.text << String (CharPointer_UTF8 ("  \xe2\x80\xba"));    // a little arrow: there is more
+            }
+            flat.addItem (std::move (item));
+        }
+        flat.showMenuAsync (options, [subMenus, options, onResult, laf = &lookAndFeel] (int result) mutable
+        {
+            const int sub = result - firstSubMenu;
+            if (result >= firstSubMenu && sub < (int) subMenus.size())
+            {
+                showMenu (subMenus[(size_t) sub], *laf, options, onResult);
+                return;
+            }
+            if (onResult) onResult (result);
+        });
+    }
+
     static void showChoiceMenu (Component& owner, const StringArray& names, const StringArray& descriptions, int current,
                                 std::function<void (int)> chosen)
     {
@@ -296,7 +333,7 @@ namespace kcui
             menu.addItem (item);
         }
         const auto screen = owner.getScreenBounds();
-        menu.showMenuAsync (PopupMenu::Options().withTargetScreenArea (screen)
+        showMenu (menu, owner.getLookAndFeel(), PopupMenu::Options().withTargetScreenArea (screen)
                                                 .withMinimumWidth (jmax (screen.getWidth(), 300))
                                                 .withStandardItemHeight (menuItemHeight()),
                             [safe = Component::SafePointer<Component> (&owner), chosen] (int result)

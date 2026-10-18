@@ -1,0 +1,61 @@
+# Puts the Key Compass sync server (cloud/) on Cloudflare whenever it changes, then checks the live copy.
+# Needs two repository secrets: CLOUDFLARE_API_TOKEN ("Edit Cloudflare Workers" token) and CLOUDFLARE_ACCOUNT_ID.
+name: Cloud sync server
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'cloud/**', '.github/workflows/cloud.yml' ]
+  workflow_dispatch:
+
+concurrency:
+  group: cloud-sync
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test the server on the build machine first
+        run: |
+          node --no-warnings cloud/test/local-server.mjs 8787 &
+          sleep 2
+          node cloud/test/smoke.mjs http://127.0.0.1:8787
+
+      - name: Check the Cloudflare secrets are there
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$ACCOUNT" ]; then
+            echo "::error::Add the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets (Settings > Secrets and variables > Actions)"
+            exit 1
+          fi
+
+      - name: Deploy to Cloudflare
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloud
+          command: deploy
+
+      - name: Check the live server
+        env:
+          URL_OUT: ${{ steps.deploy.outputs.deployment-url }}
+          CMD_OUT: ${{ steps.deploy.outputs.command-output }}
+        run: |
+          url="$URL_OUT"
+          [ -z "$url" ] && url=$(echo "$CMD_OUT" | grep -o 'https://[a-zA-Z0-9.-]*workers\.dev' | head -1)
+          if [ -z "$url" ]; then echo "::error::Couldn't find the server's address in the deploy output"; echo "$CMD_OUT"; exit 1; fi
+          echo "::notice::Sync server: $url"
+          sleep 5
+          node cloud/test/smoke.mjs "$url"

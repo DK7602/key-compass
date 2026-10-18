@@ -6,6 +6,7 @@ name: Android app
 on:
   push:
     branches: [ main ]
+    paths-ignore: [ 'cloud/**', '.github/workflows/cloud.yml' ]     # the sync server has its own workflow
   workflow_dispatch:
 
 permissions:

@@ -1,0 +1,15 @@
+# Key Compass cloud sync server (a Cloudflare Worker with a D1 database).
+# GitHub deploys it on every push that changes cloud/ (.github/workflows/cloud.yml).
+name = "keycompass-sync"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+preview_urls = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "keycompass-sync"
+database_id = "6e1ab7f8-bd60-433b-b73a-b66092991eeb"
+
+[observability]
+enabled = true

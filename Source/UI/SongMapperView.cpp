@@ -331,7 +331,7 @@ namespace kcui
         m.setLookAndFeel (&getLookAndFeel());
         buildMenu (m);
         const auto screen = getScreenBounds();
-        m.showMenuAsync (PopupMenu::Options().withTargetScreenArea (screen).withMinimumWidth (jmax (screen.getWidth(), 220)).withStandardItemHeight (menuItemHeight()),
+        showMenu (m, getLookAndFeel(), PopupMenu::Options().withTargetScreenArea (screen).withMinimumWidth (jmax (screen.getWidth(), 220)).withStandardItemHeight (menuItemHeight()),
                          [safe = Component::SafePointer<MenuBox> (this)] (int result)
                          {
                              if (safe != nullptr && result != 0 && safe->onResult) safe->onResult (result);
@@ -758,7 +758,7 @@ namespace kcui
             }
             m.addSubMenu ("Major keys", major);
             m.addSubMenu ("Minor keys", minor);
-            m.showMenuAsync (PopupMenu::Options().withTargetScreenArea (getScreenBounds()).withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withTargetScreenArea (getScreenBounds()).withStandardItemHeight (menuItemHeight()),
                              [this, safe = SafePointer<HeaderView> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0) return;
@@ -778,7 +778,7 @@ namespace kcui
             m.addItem (10, "4/4", true, page.song.timeSignature == 0);
             m.addItem (11, "3/4", true, page.song.timeSignature == 1);
             m.addItem (12, "6/8", true, page.song.timeSignature == 2);
-            m.showMenuAsync (PopupMenu::Options().withTargetScreenArea (getScreenBounds()).withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withTargetScreenArea (getScreenBounds()).withStandardItemHeight (menuItemHeight()),
                              [this, safe = SafePointer<HeaderView> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0) return;
@@ -982,7 +982,7 @@ namespace kcui
             m.setLookAndFeel (&getLookAndFeel());
             auto chords = std::make_shared<std::vector<sm::Chord>>();
             page.fillChordMenu (m, 1000, *chords);
-            m.showMenuAsync (PopupMenu::Options().withTargetScreenArea (getScreenBounds()).withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withTargetScreenArea (getScreenBounds()).withStandardItemHeight (menuItemHeight()),
                              [this, chords, safe = SafePointer<TrayGrid> (this)] (int r)
                              {
                                  const int i = SongMapperPage::chordMenuIndex (r, 1000, *chords);
@@ -1006,7 +1006,7 @@ namespace kcui
             m.addItem (5, "Practice view (big diagrams)");
             m.addSeparator();
             m.addItem (4, "Remove");
-            m.showMenuAsync (PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
                              [this, index, chords, safe = SafePointer<TrayGrid> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0 || index >= (int) page.song.tray.size()) return;
@@ -2204,7 +2204,7 @@ namespace kcui
             m.addItem (5, "Octave down");
             m.addSeparator();
             m.addItem (6, "Delete");
-            m.showMenuAsync (PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
                              [this, idx, bpb, safe = SafePointer<LaneView> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0 || ! isPositiveAndBelow (idx, (int) line().notes.size())) return;
@@ -2235,7 +2235,7 @@ namespace kcui
             }
             m.addItem (1, "Clear this row", ! line().notes.empty());
             m.addItem (2, "Hide this row (the notes are kept)");
-            m.showMenuAsync (PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
                              [this, safe = SafePointer<LaneView> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0) return;
@@ -2660,7 +2660,7 @@ namespace kcui
             PopupMenu keyMenu;
             page.fillChordMenu (keyMenu, 1000, *chords);
             m.addSubMenu ("Key chords", keyMenu);
-            m.showMenuAsync (PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
                              [this, chords, safe = SafePointer<SectionRow> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0) return;
@@ -2685,7 +2685,7 @@ namespace kcui
             m.addItem (6, String (CharPointer_UTF8 ("Move right  \xe2\x96\xb8")), chip < count - 1);
             m.addSeparator();
             m.addItem (4, "Remove");
-            m.showMenuAsync (PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
                              [this, chip, chords, safe = SafePointer<SectionRow> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0 || chip >= (int) section().chords.size()) return;
@@ -2718,7 +2718,7 @@ namespace kcui
             m.addItem (8, "Lead line", true, section().lead.enabled);
             m.addSeparator();
             m.addItem (5, "Delete section");
-            m.showMenuAsync (PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
                              [this, safe = SafePointer<SectionRow> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0) return;
@@ -3108,7 +3108,7 @@ namespace kcui
             m.setLookAndFeel (&getLookAndFeel());
             const char* names[] = { "Intro", "Verse", "Pre-Chorus", "Chorus", "Post-Chorus", "Hook", "Bridge", "Solo", "Breakdown", "Build", "Drop", "Interlude", "Outro" };
             for (int i = 0; i < 13; ++i) m.addItem (i + 1, names[i]);
-            m.showMenuAsync (PopupMenu::Options().withTargetScreenArea (target != nullptr ? target->getScreenBounds() : getScreenBounds()).withStandardItemHeight (menuItemHeight()),
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withTargetScreenArea (target != nullptr ? target->getScreenBounds() : getScreenBounds()).withStandardItemHeight (menuItemHeight()),
                              [this, safe = SafePointer<TimelinePanel> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0) return;
@@ -3288,7 +3288,7 @@ namespace kcui
             m.addItem (4, "Add as a new section");
             m.addSeparator();
             m.addItem (5, page.favourites->contains (roman) ? "Remove from favourites" : "Add to favourites");
-            m.showMenuAsync (PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
+            kcui::showMenu (m, getLookAndFeel(), PopupMenu::Options().withMousePosition().withStandardItemHeight (menuItemHeight()),
                              [this, safe = SafePointer<ProgRow> (this)] (int r)
                              {
                                  if (safe == nullptr || r == 0) return;
@@ -4240,7 +4240,7 @@ namespace kcui
             m.addItem (5, "Move to the end", movable && index < count - 1);
             if (! movable)
                 m.addSectionHeader ("Pick the progression or a section to rearrange");
-            m.showMenuAsync (PopupMenu::Options().withTargetScreenArea (Rectangle<int> (Desktop::getMousePosition(), Desktop::getMousePosition()).expanded (1))
+            showMenu (m, getLookAndFeel(), PopupMenu::Options().withTargetScreenArea (Rectangle<int> (Desktop::getMousePosition(), Desktop::getMousePosition()).expanded (1))
                                                  .withStandardItemHeight (menuItemHeight()),
                              [safe = SafePointer<PracticeView> (this), index] (int r)
                              {
@@ -5044,7 +5044,7 @@ namespace kcui
         if (! isTouchUI()) m.addSectionHeader (cmd + "+Z undoes, " + cmd + "+Shift+Z redoes");
         m.addSectionHeader (versionText());
         auto target = songButton.isShowing() ? songButton.getScreenBounds() : Rectangle<int> (Desktop::getMousePosition(), Desktop::getMousePosition()).expanded (2);
-        m.showMenuAsync (PopupMenu::Options().withTargetScreenArea (target).withStandardItemHeight (menuItemHeight()),
+        showMenu (m, getLookAndFeel(), PopupMenu::Options().withTargetScreenArea (target).withStandardItemHeight (menuItemHeight()),
                          [this, safe = SafePointer<SongMapperPage> (this)] (int r)
                          {
                              if (safe == nullptr || r == 0) return;

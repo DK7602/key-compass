@@ -186,4 +186,10 @@ namespace kcui
         PlateButton() : juce::Button ("Clear History") {}
         void paintButton (juce::Graphics&, bool highlighted, bool down) override;
     };
+
+    //==============================================================================
+    // Shows a pop-up menu. A finger can't hover, so on a touch screen a sub-menu's item opens it as a second
+    // menu (marked with an arrow) instead of opening beside the first one.
+    void showMenu (juce::PopupMenu& menu, juce::LookAndFeel& lookAndFeel, const juce::PopupMenu::Options& options,
+                   std::function<void (int)> onResult);
 }
