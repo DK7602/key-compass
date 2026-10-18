@@ -1,0 +1,691 @@
+Downloading https://services.gradle.org/distributions/gradle-8.13-all.zip
+.................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+Unzipping /home/runner/.gradle/wrapper/dists/gradle-8.13-all/54h0s9kvb6g2sinako7ub77ku/gradle-8.13-all.zip to /home/runner/.gradle/wrapper/dists/gradle-8.13-all/54h0s9kvb6g2sinako7ub77ku
+Set executable permissions for: /home/runner/.gradle/wrapper/dists/gradle-8.13-all/54h0s9kvb6g2sinako7ub77ku/gradle-8.13/bin/gradle
+
+Welcome to Gradle 8.13!
+
+Here are the highlights of this release:
+ - Daemon JVM auto-provisioning
+ - Enhancements for Scala plugin and JUnit testing
+ - Improvements for build authors and plugin developers
+
+For more details see https://docs.gradle.org/8.13/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+Checking the license for package NDK (Side by side) 28.1.13356709 in /usr/local/lib/android/sdk/licenses
+License for package NDK (Side by side) 28.1.13356709 accepted.
+Preparing "Install NDK (Side by side) 28.1.13356709 v.28.1.13356709".
+"Install NDK (Side by side) 28.1.13356709 v.28.1.13356709" ready.
+Installing NDK (Side by side) 28.1.13356709 in /usr/local/lib/android/sdk/ndk/28.1.13356709
+"Install NDK (Side by side) 28.1.13356709 v.28.1.13356709" complete.
+"Install NDK (Side by side) 28.1.13356709 v.28.1.13356709" finished.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preRelease_ReleaseBuild UP-TO-DATE
+
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+Checking the license for package CMake 3.22.1 in /usr/local/lib/android/sdk/licenses
+License for package CMake 3.22.1 accepted.
+Preparing "Install CMake 3.22.1 v.3.22.1".
+"Install CMake 3.22.1 v.3.22.1" ready.
+Installing CMake 3.22.1 in /usr/local/lib/android/sdk/cmake/3.22.1
+"Install CMake 3.22.1 v.3.22.1" complete.
+"Install CMake 3.22.1 v.3.22.1" finished.
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+C/C++: ninja: Entering directory `/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/.cxx/RelWithDebInfo/3t105v66/arm64-v8a'
+C/C++: /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o -c /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp:3:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_utils/juce_audio_utils.h:66:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_gui_basics/juce_gui_basics.h:68:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_graphics/juce_graphics.h:67:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+C/C++: /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+C/C++:    68 |  #error "No global header file was included!"
+C/C++:       |   ^
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp:7:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+C/C++: /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+C/C++:    62 |     KeyCompassProcessor& processor;
+C/C++:       |                          ^
+C/C++: /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+C/C++:    69 |     AudioProcessor& processor;
+C/C++:       |                     ^
+C/C++: 1 warning and 1 error generated.
+C/C++: /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp:2:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.h:4:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+C/C++: /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+C/C++:    68 |  #error "No global header file was included!"
+C/C++:       |   ^
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp:3:
+C/C++: /home/runner/work/key-compass/key-compass/Source/PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+C/C++:    62 |     KeyCompassProcessor& processor;
+C/C++:       |                          ^
+C/C++: /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+C/C++:    69 |     AudioProcessor& processor;
+C/C++:       |                     ^
+C/C++: 1 warning and 1 error generated.
+C/C++: /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o -c /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp:2:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.h:5:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+C/C++: /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+C/C++:    68 |  #error "No global header file was included!"
+C/C++:       |   ^
+C/C++: 1 error generated.
+C/C++: /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp:2:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.h:4:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.h:4:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+C/C++: /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+C/C++:    68 |  #error "No global header file was included!"
+C/C++:       |   ^
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp:2:
+C/C++: /home/runner/work/key-compass/key-compass/Source/PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+C/C++:    62 |     KeyCompassProcessor& processor;
+C/C++:       |                          ^
+C/C++: /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+C/C++:    69 |     AudioProcessor& processor;
+C/C++:       |                     ^
+C/C++: 1 warning and 1 error generated.
+C/C++: /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:2:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:4:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginProcessor.h:4:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+C/C++: /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+C/C++:    68 |  #error "No global header file was included!"
+C/C++:       |   ^
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:2:
+C/C++: In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+C/C++: /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+C/C++:    62 |     KeyCompassProcessor& processor;
+C/C++:       |                          ^
+C/C++: /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+C/C++:    69 |     AudioProcessor& processor;
+C/C++:       |                     ^
+C/C++: /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:62:27: warning: declaration shadows a field of 'MobileEditor' [-Wshadow]
+C/C++:    62 |     int itemIndexFor (int tab) const
+C/C++:       |                           ^
+C/C++: /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:66:9: note: previous declaration is here
+C/C++:    66 |     int tab = compassTab, panes = 1;
+C/C++:       |         ^
+C/C++: /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:304:13: warning: private field 'assets' is not used [-Wunused-private-field]
+C/C++:   304 |     Assets& assets;
+C/C++:       |             ^
+C/C++: 3 warnings and 1 error generated.
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a] FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:buildCMakeRelWithDebInfo[arm64-v8a]'.
+> com.android.ide.common.process.ProcessException: ninja: Entering directory `/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/.cxx/RelWithDebInfo/3t105v66/arm64-v8a'
+  [1/107] Building C object CMakeFiles/cpufeatures.dir/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures/cpu-features.c.o
+  [2/107] Linking C static library libcpufeatures.a
+  [3/107] Building CXX object oboe/CMakeFiles/oboe.dir/src/flowgraph/SampleRateConverter.cpp.o
+  [4/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Engine/MusicTheory.cpp.o
+  [5/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Engine/KeyEngine.cpp.o
+  [6/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/ProgressionLibrary.cpp.o
+  [7/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o
+  FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o 
+  /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o -c /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp
+  In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp:3:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_utils/juce_audio_utils.h:66:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_gui_basics/juce_gui_basics.h:68:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_graphics/juce_graphics.h:67:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+  /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+     68 |  #error "No global header file was included!"
+        |   ^
+  In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp:7:
+  In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+  /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+     62 |     KeyCompassProcessor& processor;
+        |                          ^
+  /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+     69 |     AudioProcessor& processor;
+        |                     ^
+  1 warning and 1 error generated.
+  [8/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o
+  FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o 
+  /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp
+  In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp:2:
+  In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.h:4:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+  /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+     68 |  #error "No global header file was included!"
+        |   ^
+  In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp:3:
+  /home/runner/work/key-compass/key-compass/Source/PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+     62 |     KeyCompassProcessor& processor;
+        |                          ^
+  /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+     69 |     AudioProcessor& processor;
+        |                     ^
+  1 warning and 1 error generated.
+  [9/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o
+  FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o 
+  /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o -c /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp
+  In file included from /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp:2:
+  In file included from /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.h:5:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+  /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+     68 |  #error "No global header file was included!"
+        |   ^
+  1 error generated.
+  [10/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o
+  FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o 
+  /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp
+  In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp:2:
+  In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.h:4:
+  In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.h:4:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+  /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+     68 |  #error "No global header file was included!"
+        |   ^
+  In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp:2:
+  /home/runner/work/key-compass/key-compass/Source/PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+     62 |     KeyCompassProcessor& processor;
+        |                          ^
+  /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+     69 |     AudioProcessor& processor;
+        |                     ^
+  1 warning and 1 error generated.
+  [11/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o
+  FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o 
+  /usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp
+  In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:2:
+  In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+  In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:4:
+  In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginProcessor.h:4:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+  In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+  /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+     68 |  #error "No global header file was included!"
+        |   ^
+  In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:2:
+  In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+  /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+     62 |     KeyCompassProcessor& processor;
+        |                          ^
+  /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+     69 |     AudioProcessor& processor;
+        |                     ^
+  /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:62:27: warning: declaration shadows a field of 'MobileEditor' [-Wshadow]
+     62 |     int itemIndexFor (int tab) const
+        |                           ^
+  /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:66:9: note: previous declaration is here
+     66 |     int tab = compassTab, panes = 1;
+        |         ^
+  /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:304:13: warning: private field 'assets' is not used [-Wunused-private-field]
+    304 |     Assets& assets;
+        |             ^
+  3 warnings and 1 error generated.
+  [12/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/ChordTheory.cpp.o
+  ninja: build stopped: subcommand failed.
+  
+  C++ build system [build] failed while executing:
+      /usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja \
+        -C \
+        /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/.cxx/RelWithDebInfo/3t105v66/arm64-v8a \
+        juce_jni
+    from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app
+
+* Try:
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:buildCMakeRelWithDebInfo[arm64-v8a]'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:40)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+Caused by: org.gradle.internal.UncheckedException: com.android.ide.common.process.ProcessException: ninja: Entering directory `/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/.cxx/RelWithDebInfo/3t105v66/arm64-v8a'
+[1/107] Building C object CMakeFiles/cpufeatures.dir/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures/cpu-features.c.o
+[2/107] Linking C static library libcpufeatures.a
+[3/107] Building CXX object oboe/CMakeFiles/oboe.dir/src/flowgraph/SampleRateConverter.cpp.o
+[4/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Engine/MusicTheory.cpp.o
+[5/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Engine/KeyEngine.cpp.o
+[6/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/ProgressionLibrary.cpp.o
+[7/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o -c /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp:3:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_utils/juce_audio_utils.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_gui_basics/juce_gui_basics.h:68:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_graphics/juce_graphics.h:67:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp:7:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+/home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+   62 |     KeyCompassProcessor& processor;
+      |                          ^
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+   69 |     AudioProcessor& processor;
+      |                     ^
+1 warning and 1 error generated.
+[8/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp:3:
+/home/runner/work/key-compass/key-compass/Source/PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+   62 |     KeyCompassProcessor& processor;
+      |                          ^
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+   69 |     AudioProcessor& processor;
+      |                     ^
+1 warning and 1 error generated.
+[9/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o -c /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.h:5:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+1 error generated.
+[10/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp:2:
+/home/runner/work/key-compass/key-compass/Source/PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+   62 |     KeyCompassProcessor& processor;
+      |                          ^
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+   69 |     AudioProcessor& processor;
+      |                     ^
+1 warning and 1 error generated.
+[11/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginProcessor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+/home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+   62 |     KeyCompassProcessor& processor;
+      |                          ^
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+   69 |     AudioProcessor& processor;
+      |                     ^
+/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:62:27: warning: declaration shadows a field of 'MobileEditor' [-Wshadow]
+   62 |     int itemIndexFor (int tab) const
+      |                           ^
+/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:66:9: note: previous declaration is here
+   66 |     int tab = compassTab, panes = 1;
+      |         ^
+/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:304:13: warning: private field 'assets' is not used [-Wunused-private-field]
+  304 |     Assets& assets;
+      |             ^
+3 warnings and 1 error generated.
+[12/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/ChordTheory.cpp.o
+ninja: build stopped: subcommand failed.
+
+C++ build system [build] failed while executing:
+    /usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja \
+      -C \
+      /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/.cxx/RelWithDebInfo/3t105v66/arm64-v8a \
+      juce_jni
+  from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app
+	at org.gradle.internal.UncheckedException.throwAsUncheckedException(UncheckedException.java:69)
+	at org.gradle.internal.UncheckedException.throwAsUncheckedException(UncheckedException.java:42)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:128)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.doExecute(StandardTaskAction.java:58)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:244)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:229)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:212)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:195)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:162)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:67)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:37)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:40)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:29)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:75)
+	at org.gradle.internal.Either$Right.fold(Either.java:175)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:65)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:36)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:107)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:56)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:40)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+Caused by: com.android.ide.common.process.ProcessException: ninja: Entering directory `/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/.cxx/RelWithDebInfo/3t105v66/arm64-v8a'
+[1/107] Building C object CMakeFiles/cpufeatures.dir/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures/cpu-features.c.o
+[2/107] Linking C static library libcpufeatures.a
+[3/107] Building CXX object oboe/CMakeFiles/oboe.dir/src/flowgraph/SampleRateConverter.cpp.o
+[4/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Engine/MusicTheory.cpp.o
+[5/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Engine/KeyEngine.cpp.o
+[6/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/ProgressionLibrary.cpp.o
+[7/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp.o -c /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp:3:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_utils/juce_audio_utils.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_gui_basics/juce_gui_basics.h:68:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_graphics/juce_graphics.h:67:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileApp.cpp:7:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+/home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+   62 |     KeyCompassProcessor& processor;
+      |                          ^
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+   69 |     AudioProcessor& processor;
+      |                     ^
+1 warning and 1 error generated.
+[8/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.cpp:3:
+/home/runner/work/key-compass/key-compass/Source/PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+   62 |     KeyCompassProcessor& processor;
+      |                          ^
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+   69 |     AudioProcessor& processor;
+      |                     ^
+1 warning and 1 error generated.
+[9/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp.o -c /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/SongMapper/Audition.h:5:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+1 error generated.
+[10/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginProcessor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+In file included from /home/runner/work/key-compass/key-compass/Source/PluginEditor.cpp:2:
+/home/runner/work/key-compass/key-compass/Source/PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+   62 |     KeyCompassProcessor& processor;
+      |                          ^
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+   69 |     AudioProcessor& processor;
+      |                     ^
+1 warning and 1 error generated.
+[11/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o
+FAILED: CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o 
+/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=aarch64-none-linux-android26 --sysroot=/usr/local/lib/android/sdk/ndk/28.1.13356709/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DJUCER_ANDROIDSTUDIO_7F0E4A25=1 -DJUCE_ANDROID=1 -DJUCE_ANDROID_API_VERSION=26 -DJUCE_ANDROID_GL_ES_VERSION_3_0=1 -DJUCE_APP_VERSION=1.4.0 -DJUCE_APP_VERSION_HEX=0x10400 -DJUCE_CONTENT_SHARING=1 -DKC_MOBILE=1 -DNDEBUG=1 -Djuce_jni_EXPORTS -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../JuceLibraryCode -I/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules -I/usr/local/lib/android/sdk/ndk/28.1.13356709/sources/android/cpufeatures -I/home/runner/work/key-compass/key-compass/JUCE/modules/juce_audio_devices/native/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__ -Werror=unguarded-availability -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fexceptions -frtti -O3 -O2 -g -DNDEBUG -fPIC -Wall -Wcast-align -Wfloat-equal -Wno-ignored-qualifiers -Wsign-compare -Wsign-conversion -Wstrict-aliasing -Wswitch-enum -Wuninitialized -Wunreachable-code -Wunused-parameter -Wmissing-field-initializers -Wshadow-all -Wshorten-64-to-32 -Wconversion -Wint-conversion -Wconditional-uninitialized -Wconstant-conversion -Wbool-conversion -Wextra-semi -Wshift-sign-overflow -Wmissing-prototypes -Wnullable-to-nonnull-conversion -Wpedantic -Wdeprecated -Woverloaded-virtual -Wreorder -Wzero-as-null-pointer-constant -Wunused-private-field -Winconsistent-missing-destructor-override -fsigned-char -std=c++17 -MD -MT CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o -MF CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o.d -o CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp.o -c /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/../PluginProcessor.h:4:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/juce_audio_processors.h:64:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors_headless/juce_audio_processors_headless.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_basics/juce_audio_basics.h:66:
+In file included from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/juce_core.h:77:
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_core/system/juce_TargetPlatform.h:68:3: error: "No global header file was included!"
+   68 |  #error "No global header file was included!"
+      |   ^
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:2:
+In file included from /home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:8:
+/home/runner/work/key-compass/key-compass/Source/Mobile/../PluginEditor.h:62:26: warning: non-static data member 'processor' of 'KeyCompassEditor' shadows member inherited from type 'AudioProcessorEditor' [-Wshadow-field]
+   62 |     KeyCompassProcessor& processor;
+      |                          ^
+/home/runner/work/key-compass/key-compass/Android/Builds/Android/app/../../../../JUCE/modules/juce_audio_processors/processors/juce_AudioProcessorEditor.h:69:21: note: declared here
+   69 |     AudioProcessor& processor;
+      |                     ^
+/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:62:27: warning: declaration shadows a field of 'MobileEditor' [-Wshadow]
+   62 |     int itemIndexFor (int tab) const
+      |                           ^
+/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.h:66:9: note: previous declaration is here
+   66 |     int tab = compassTab, panes = 1;
+      |         ^
+/home/runner/work/key-compass/key-compass/Source/Mobile/MobileEditor.cpp:304:13: warning: private field 'assets' is not used [-Wunused-private-field]
+  304 |     Assets& assets;
+      |             ^
+3 warnings and 1 error generated.
+[12/107] Building CXX object CMakeFiles/juce_jni.dir/home/runner/work/key-compass/key-compass/Source/SongMapper/ChordTheory.cpp.o
+ninja: build stopped: subcommand failed.
+
+C++ build system [build] failed while executing:
+    /usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja \
+      -C \
+      /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/.cxx/RelWithDebInfo/3t105v66/arm64-v8a \
+      juce_jni
+  from /home/runner/work/key-compass/key-compass/Android/Builds/Android/app
+	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.execute(ExecuteProcess.kt:288)
+	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt$executeProcess$1.invoke(ExecuteProcess.kt:108)
+	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt$executeProcess$1.invoke(ExecuteProcess.kt:106)
+	at com.android.build.gradle.internal.cxx.timing.TimingEnvironmentKt.time(TimingEnvironment.kt:32)
+	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.executeProcess(ExecuteProcess.kt:106)
+	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.executeProcess$default(ExecuteProcess.kt:85)
+	at com.android.build.gradle.internal.cxx.build.CxxRegularBuilder.executeProcessBatch(CxxRegularBuilder.kt:332)
+	at com.android.build.gradle.internal.cxx.build.CxxRegularBuilder.build(CxxRegularBuilder.kt:129)
+	at com.android.build.gradle.tasks.ExternalNativeBuildTask.doTaskAction(ExternalNativeBuildTask.kt:72)
+	at com.android.build.gradle.internal.tasks.UnsafeOutputsTask$taskAction$$inlined$recordTaskAction$1.invoke(BaseTask.kt:78)
+	at com.android.build.gradle.internal.tasks.Blocks.recordSpan(Blocks.java:51)
+	at com.android.build.gradle.internal.tasks.UnsafeOutputsTask.taskAction(UnsafeOutputsTask.kt:81)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+	... 117 more
+Caused by: com.android.ide.common.process.ProcessException: Error while executing process /usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja with arguments {-C /home/runner/work/key-compass/key-compass/Android/Builds/Android/app/.cxx/RelWithDebInfo/3t105v66/arm64-v8a juce_jni}
+	at com.android.build.gradle.internal.process.GradleProcessResult.buildProcessException(GradleProcessResult.java:73)
+	at com.android.build.gradle.internal.process.GradleProcessResult.assertNormalExitValue(GradleProcessResult.java:48)
+	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.execute(ExecuteProcess.kt:277)
+	... 132 more
+Caused by: org.gradle.process.internal.ExecException: Process 'command '/usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja'' finished with non-zero exit value 1
+	at org.gradle.process.internal.DefaultExecHandle$ExecResultImpl.assertNormalExitValue(DefaultExecHandle.java:442)
+	at com.android.build.gradle.internal.process.GradleProcessResult.assertNormalExitValue(GradleProcessResult.java:46)
+	... 133 more
+
+
+BUILD FAILED in 1m 7s
+2 actionable tasks: 2 executed
