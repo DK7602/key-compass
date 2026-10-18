@@ -59,6 +59,7 @@ namespace kcsync
         void keepThis();                             // keep this one; the newer version stays in My Songs as a copy
 
         void flush();                                // save a change that is still waiting
+        void ensureSaved();                          // the open song is in My Songs (even if never changed)
         void openSong (const juce::String& id);      // the open song is saved first
         void newSong (const std::vector<std::pair<juce::String, int>>& layout);
         void importedSong();                         // a .kcsong file was just opened into the song

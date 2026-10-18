@@ -171,10 +171,10 @@ DRAG TO DAW     Drag the round DRAG SONG TO DAW porthole (top-right) onto a MIDI
                 make a track for each; to put one part on a track you already have,
                 drag its pill or the row's own arrow instead. Click the porthole to save
                 a .mid file.
-SONG menu       Undo / redo (also Ctrl+Z / Ctrl+Shift+Z), new song from a template,
-                rename the song (the name of the MIDI part), save a MIDI file, and
-                save / open a song file (.kcsong) to move the whole song to or from
-                the Android app (see KEY COMPASS ON ANDROID).
+SONG menu       My songs (every song you've made) and Cloud sync (see MY SONGS AND
+                CLOUD SYNC), undo / redo (also Ctrl+Z / Ctrl+Shift+Z), a new song from
+                a template, rename the song (the name of the MIDI part), save a MIDI
+                file, and save / open a song file (.kcsong).
 BOTTOM PLATES   On this page the six controls at the bottom change job:
                   PLAY STYLE  how chords play, in the preview AND in the MIDI:
                               Block (held), Pulse (8ths), Strum (down-up), Arpeggio
@@ -190,7 +190,7 @@ BOTTOM PLATES   On this page the six controls at the bottom change job:
 
 The preview sound plays through the track Key Compass is on (in the standalone app,
 through your speakers). VOL under the porthole sets its level. Your song is saved
-with the Cubase project; favourites are shared by every project.
+with the Cubase project, and also in My Songs; favourites are shared by every project.
 
 
 STANDALONE APP
@@ -217,7 +217,7 @@ A phone held upright has tabs along the bottom:
   CHORDS    chord diagrams and the progression
   SONG      the song's sections, with the bass and lead rows
   LIBRARY   the progression browser
-  SETTINGS  tap tempo, capture chords, the SONG menu, play style, time signature,
+  SETTINGS  MY SONGS, the SONG menu, tap tempo, capture chords, play style, time signature,
             octave, lock key, volume, sharing, the compass's response and tuning,
             and the manual
 Turn it on its side and the tabs move down the left (the compass shows its lid and dial
@@ -234,7 +234,8 @@ TOUCH
     a row's arrow button, press and hold CHORDS / BASS / LEAD, or SETTINGS > SHARE MIDI.
     Send the .mid to yourself (Drive, Gmail...) and drop it into Cubase on the PC.
 
-SONG FILES (phone <-> PC): SETTINGS > SHARE SONG FILE sends the whole song - sections,
+SONG FILES (phone <-> PC): with cloud sync on (see below) your songs are on both already.
+Without it: SETTINGS > SHARE SONG FILE sends the whole song - sections,
 chords, bass and lead lines and settings - as a .kcsong file. On the PC open it with the
 SONG menu > Open a song file. The other way: SONG menu > Save song file on the PC, put it
 on Drive (or email it), then SETTINGS > OPEN SONG FILE on the phone. Undo brings back
@@ -244,12 +245,48 @@ The app saves itself whenever you switch away from it. It keeps the screen on wh
 it hears music, plays the song or shows the practice view.
 
 
+MY SONGS AND CLOUD SYNC (PC, phone, tablet)
+-------------------------------------------
+MY SONGS keeps every song you work on. The song you have open saves itself there a
+moment after each change - there is nothing to remember to save. Open it from the SONG
+menu (PC) or SETTINGS > MY SONGS (phone / tablet):
+  - Tap (click) a song to open it. The song you had open stays in My Songs.
+  - + NEW SONG starts a new one from a template.
+  - Press and hold (right-click) a song to rename, duplicate, share or delete it.
+On the PC each Cubase project still keeps its own song as before; My Songs is shared by
+every project and by the standalone app.
+
+CLOUD SYNC keeps My Songs and your starred progressions the same on all your devices.
+  1. On one device: My Songs > CLOUD SYNC > TURN ON SYNC. It shows a sync code,
+     like 7H3Q-M9XD-2PLA-W6RT-K4NE.
+  2. On each other device: My Songs > CLOUD SYNC, type that code, JOIN.
+After that it works by itself: what you change on one device appears on the others
+within about half a minute (straight away when you open My Songs). You can work offline;
+it catches up when you're connected. Keep the code to yourself - anyone with it can see
+and change your songs. TURN OFF stops syncing on that device (your songs stay there);
+"Turn off and delete the songs in the cloud" also removes the cloud copy.
+
+If a song was changed on two devices before they could sync, nothing is lost: one keeps
+the song's name and the other becomes a copy, e.g. "Verse idea (PC copy)", and a message
+says so. If you open a Cubase project whose song was changed on another device since,
+Key Compass asks whether to load the newer version or keep the project's (the other one
+stays in My Songs). Volume, mutes and the genre being browsed belong to each device and
+aren't synced.
+
+
 TROUBLESHOOTING
 ---------------
 - Android: the compass doesn't react - allow the microphone (tap the red note on the
   compass, or Settings > Apps > Key Compass > Permissions > Microphone > Allow).
 - Android: "App not installed" when updating - the new app was signed differently from
   the one on the phone. Uninstall Key Compass (share your song file first), then install.
+- Cloud sync says "Offline": the device has no internet connection (or a Wi-Fi sign-in
+  page is in the way). Your changes are kept and go up when it's back.
+- "That code isn't right": compare it with the code on the other device (My Songs >
+  CLOUD SYNC there). Letters O and I and digits 0 and 1 are never used.
+- "The cloud doesn't know this sync code any more": the cloud copy was deleted from
+  another device. TURN OFF, then TURN ON SYNC again and join the other devices to the
+  new code.
 - The build failed: open build-log.txt in this folder; the error is near the bottom.
 - "Could not copy the plug-in": close Cubase and run Build and Install.bat again.
 - Song Mapper bass or lead sounds out of tune against the chords: the KEY at the top

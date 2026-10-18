@@ -85,6 +85,12 @@ namespace kcsync
         if (isTimerRunning()) saveNow();
     }
 
+    void SongLink::ensureSaved()
+    {
+        if (song.songId.isEmpty() || isTimerRunning() || ! hub->getLibrary().find (song.songId).isValid())
+            saveNow();
+    }
+
     void SongLink::saveNow()
     {
         stopTimer();

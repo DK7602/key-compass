@@ -114,12 +114,28 @@ alive "leaving and coming back"
 # My Songs and cloud sync, against the real sync server (Settings > MY SONGS > CLOUD SYNC > TURN ON SYNC).
 # Where the buttons are on this screen comes from the Linux test build ("KeyCompassMobileShots out positions").
 dp() { echo $(( $1 * dpi / 160 )); }
+# tap a button by its words, found through Android's accessibility tree; else at the given dp position
+tap_button() {
+    local words="$1" x y
+    adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1
+    local b
+    b=$(adb shell cat /sdcard/ui.xml 2>/dev/null | tr '>' '\n' | grep -E "(text|content-desc)=\"$words\"" | grep -o 'bounds="[^"]*"' | head -1)
+    if [ -n "$b" ]; then
+        set -- $(echo "$b" | grep -o '[0-9]*')
+        x=$(( ($1 + $3) / 2 )); y=$(( ($2 + $4) / 2 ))
+        echo "found $words at $x,$y" >> "$out/result.txt"
+    else
+        x=$(dp "$2"); y=$(dp "$3")
+        echo "tapping $words at the expected place" >> "$out/result.txt"
+    fi
+    adb shell input tap "$x" "$y"
+}
 tab 4; sleep 3
-adb shell input tap "$(dp 116)" "$(dp 184)"
+tap_button "MY SONGS" 116 184
 shot 15-mysongs 4
-adb shell input tap "$(dp 256)" "$(dp 123)"
+tap_button "CLOUD SYNC" 256 123
 shot 16-cloud 4
-adb shell input tap "$(dp 208)" "$(dp 325)"
+tap_button "TURN ON SYNC" 208 421
 shot 17-cloud-on 12
 alive "turning on cloud sync"
 adb shell input keyevent KEYCODE_BACK

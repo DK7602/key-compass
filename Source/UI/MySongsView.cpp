@@ -201,6 +201,7 @@ namespace kcui
                       });
         };
 
+        link.ensureSaved();                       // the open song is always in the list
         hub.getLibrary().addListener (this);
         hub.getCloud().addChangeListener (this);
         hub.getLibrary().rescan();

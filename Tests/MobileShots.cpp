@@ -496,8 +496,9 @@ int main (int argc, char* argv[])
         { "phone_mysongs_synced", 412, 915, phoneBars, T::moreTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
     };
 
-    // a few songs in My Songs, made on different devices
+    // a few songs in My Songs, made on different devices (and the open song saved there first)
     {
+        pump (1500);
         auto& lib = proc.getSongLink().getHub().getLibrary();
         const std::pair<const char*, const char*> demo[] = { { "Midnight Drive", "PC" }, { "Summer Chorus Idea", "phone" },
                                                              { "Worship Set in G", "PC" }, { "Blues Jam", "tablet" } };
