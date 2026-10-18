@@ -48,8 +48,18 @@ w('  <MODULES>\n')
 for m in modules:
     w(f'    <MODULE id="{m}" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>\n')
 w('  </MODULES>\n')
+# Android closes and re-opens an activity for any setting change it doesn't say it handles, and JUCE ends the whole
+# app when its activity closes - so list everything an app is allowed to handle itself (font size, display size,
+# language, dark mode, a keyboard, turning, split screen, folding...). JUCE re-lays itself out for all of these.
+config_changes = ('keyboard|keyboardHidden|orientation|screenSize|navigation|smallestScreenSize|screenLayout|uiMode|'
+                  'density|fontScale|locale|layoutDirection|touchscreen|mcc|mnc|colorMode|fontWeightAdjustment|'
+                  'grammaticalGender')
+manifest_xml = (f'<manifest><application><activity android:configChanges="{config_changes}"/></application></manifest>')
+manifest_attr = manifest_xml.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+
 w('  <EXPORTFORMATS>\n')
 w(f'    <ANDROIDSTUDIO targetFolder="Builds/Android" androidMinimumSDK="26" androidTargetSDK="35"\n'
+  f'                   androidManifestCustomXmlElements="{manifest_attr}"\n'
   f'                   androidVersionCode="{version_code}" androidScreenOrientation="unspecified"\n'
   '                   microphonePermissionNeeded="1" androidEnableContentSharing="1" androidPushNotifications="0"\n'
   '                   androidExternalReadNeeded="0" androidExternalWriteNeeded="0" androidReadMediaAudioPermission="0"\n'

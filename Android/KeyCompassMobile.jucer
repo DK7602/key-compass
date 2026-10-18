@@ -131,6 +131,7 @@
   </MODULES>
   <EXPORTFORMATS>
     <ANDROIDSTUDIO targetFolder="Builds/Android" androidMinimumSDK="26" androidTargetSDK="35"
+                   androidManifestCustomXmlElements="&lt;manifest&gt;&lt;application&gt;&lt;activity android:configChanges=&quot;keyboard|keyboardHidden|orientation|screenSize|navigation|smallestScreenSize|screenLayout|uiMode|density|fontScale|locale|layoutDirection|touchscreen|mcc|mnc|colorMode|fontWeightAdjustment|grammaticalGender&quot;/&gt;&lt;/application&gt;&lt;/manifest&gt;"
                    androidVersionCode="10400" androidScreenOrientation="unspecified"
                    microphonePermissionNeeded="1" androidEnableContentSharing="1" androidPushNotifications="0"
                    androidExternalReadNeeded="0" androidExternalWriteNeeded="0" androidReadMediaAudioPermission="0"

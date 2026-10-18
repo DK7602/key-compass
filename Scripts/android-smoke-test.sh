@@ -16,9 +16,18 @@ alive() {
     if adb shell pidof "$pkg" > /dev/null; then echo "running after $1"; else echo "NOT RUNNING after $1" | tee -a "$out/result.txt"; fi
 }
 
+# a phone that has just started up keeps changing its own settings for a minute (navigation bar, themes),
+# which would close any app that is open: wait for it to settle first
+until [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1" ]; do sleep 2; done
+sleep 45
+adb shell input keyevent KEYCODE_WAKEUP
+adb shell wm dismiss-keyguard 2> /dev/null || true
+
 adb install -r "$apk" 2>&1 | tee "$out/install.txt"
 adb shell pm grant "$pkg" android.permission.RECORD_AUDIO || true
+sleep 10
 adb logcat -c
+adb logcat -b events -c 2> /dev/null || true
 # open it the way the launcher does (the activity's class depends on the JUCE settings)
 adb shell cmd package resolve-activity --brief -c android.intent.category.LAUNCHER "$pkg" | tee "$out/start.txt"
 adb shell monkey -p "$pkg" -c android.intent.category.LAUNCHER 1 >> "$out/start.txt" 2>&1
@@ -57,6 +66,23 @@ adb shell settings put system user_rotation 0
 shot 9-upright 6
 alive "turning"
 
+# settings people change while an app is open: font size, dark mode, display size (none may close the app)
+adb shell settings put system font_scale 1.3
+shot 11-big-font 6
+adb shell settings put system font_scale 1.0
+sleep 3
+alive "changing the font size"
+adb shell cmd uimode night yes
+shot 12-dark-mode 6
+adb shell cmd uimode night no
+sleep 3
+alive "changing dark mode"
+adb shell wm density 480
+shot 13-display-size 6
+adb shell wm density reset
+shot 14-display-reset 6
+alive "changing the display size"
+
 # away and back (the app saves itself and stops the microphone, then starts again)
 adb shell input keyevent KEYCODE_HOME
 sleep 4
@@ -65,6 +91,8 @@ shot 10-back 8
 alive "leaving and coming back"
 
 adb logcat -d > "$out/logcat.txt"
+# why each window of the app opened or closed (finish reasons, restarts, process deaths)
+adb logcat -b events -d 2> /dev/null | grep -E "keycompass|am_proc_died|am_kill" | grep -E "wm_|am_" > "$out/events.txt" || true
 grep -E "FATAL|AndroidRuntime|libjuce_jni|DEBUG   :|Abort|SIGSEGV|JNI DETECTED" "$out/logcat.txt" | head -80 > "$out/crashes.txt"
 grep -iE "juce|keycompass|oboe|AudioRecord|AAudio" "$out/logcat.txt" | head -300 > "$out/app-log.txt"
 echo "done" >> "$out/result.txt"
