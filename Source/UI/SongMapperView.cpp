@@ -1136,7 +1136,7 @@ namespace kcui
             saveBtn.setTooltip ("Save this progression to your favourites");
             saveBtn.onClick = [this] { page.saveTrayAsFavourite(); };
             clearBtn.setTooltip ("Remove all chords from the progression");
-            clearBtn.onClick = [this] { page.song.clearTray(); };
+            clearBtn.onClick = [this] { page.clearProgression(); };
         }
 
         void resized() override
@@ -2695,7 +2695,12 @@ namespace kcui
                                  if (r == 6) { page.song.moveChord (index, chip, index, chip + 2); return; }     // an insertion point
                                  if (r == 1) page.auditionChord (c);
                                  else if (r == 2) page.song.insertChords (index, { c }, chip + 1);
-                                 else if (r == 3) page.song.insertTray (c);
+                                 else if (r == 3)
+                                 {
+                                     page.song.insertTray (c);
+                                     page.showNotice (page.chordText (c) + " copied to the progression"
+                                                      + page.seeItOn (SongMapperPage::Spot::progression, "\nIt's on the ", " tab."));
+                                 }
                                  else if (r == 4) page.song.removeChord (index, chip);
                                  else if (const int i = SongMapperPage::chordMenuIndex (r, 1000, *chords); i >= 0) page.song.replaceChord (index, chip, (*chords)[(size_t) i]);
                              });
@@ -2728,8 +2733,17 @@ namespace kcui
                                  else if (r == 1) page.song.duplicateSection (index);
                                  else if (r == 2) page.song.moveSection (index, index - 1);
                                  else if (r == 3) page.song.moveSection (index, index + 1);
-                                 else if (r == 4) page.song.clearSection (index);
-                                 else if (r == 5) page.song.removeSection (index);
+                                 else if (r == 4)
+                                 {
+                                     page.song.clearSection (index);
+                                     page.showNotice (section().name + " cleared\nUndo brings its chords back.");
+                                 }
+                                 else if (r == 5)
+                                 {
+                                     const String gone = section().name;
+                                     page.song.removeSection (index);
+                                     page.showNotice (gone + " deleted\nUndo brings it back.");
+                                 }
                                  else if (r == 6) startRename();
                                  else if (r == 9) page.showPractice (index);
                                  else if (r == 7 || r == 8)
@@ -3206,18 +3220,21 @@ namespace kcui
             starBtn.setTooltip ("Add to / remove from favourites");
             useBtn.setTooltip ("Load into the progression on the left");
             playBtn.onClick = [this] { page.playProgression (chords()); };
-            starBtn.onClick = [this] { page.favourites->toggle ({ name, roman, genre }); page.song.changed(); };
-            useBtn.onClick = [this]
-            {
-                const auto c = chords();
-                page.song.setTray (c);
-                if (! c.empty()) page.focusChord (c.front(), false);
-            };
+            starBtn.onClick = [this] { toggleFavourite(); };
+            useBtn.onClick = [this] { page.useProgression (chords()); };
             setTooltip ("Drag onto a song section to add all its chords. Double-click adds them to the selected section; right-click for more.");
             setMouseCursor (MouseCursor::DraggingHandCursor);
         }
 
         std::vector<sm::Chord> chords() const { return sm::resolveProgression (sm::splitNumerals (roman.toStdString()), page.currentKey()); }
+
+        void toggleFavourite()
+        {
+            const bool adding = ! page.favourites->contains (roman);
+            page.favourites->toggle ({ name, roman, genre });
+            page.song.changed();
+            page.showNotice ((adding ? "Added to favourites\n\"" : "Removed from favourites\n\"") + name + "\"");
+        }
 
         void resized() override
         {
@@ -3295,14 +3312,10 @@ namespace kcui
                                  if (safe == nullptr || r == 0) return;
                                  const auto c = chords();
                                  if (r == 1) page.playProgression (c);
-                                 else if (r == 2) { page.song.setTray (c); if (! c.empty()) page.focusChord (c.front(), false); }
+                                 else if (r == 2) page.useProgression (c);
                                  else if (r == 3) page.addToSelectedSection (c);
-                                 else if (r == 4)
-                                 {
-                                     const int idx = page.song.addSection (page.song.nextSectionName ("Verse"), 8);
-                                     page.song.insertChords (idx, c);
-                                 }
-                                 else if (r == 5) { page.favourites->toggle ({ name, roman, genre }); page.song.changed(); }
+                                 else if (r == 4) page.addAsNewSection (c);
+                                 else if (r == 5) toggleFavourite();
                              });
         }
         void mouseDrag (const MouseEvent& e) override
@@ -3886,6 +3899,8 @@ namespace kcui
             float scale = 1.0f;
             int low = 48, whites = 14;      // keyboard
             bool sideBySide = false;        // piano: the long name left of the chord name, the notes right of it
+            bool oneLineUnder = false;      // piano, a name too long for that: the long name and notes on one line under it
+            float sideFont = 17.0f;         // the long name and notes beside the chord name
         };
 
         CardLayout layoutFor (Rectangle<float> r, const sm::Chord& c) const
@@ -3896,24 +3911,45 @@ namespace kcui
 
             if (! page.song.guitar)
             {
-                // one line of writing (long name - CHORD - notes), so the keyboard gets the rest of the card
-                Font nf = page.assets.bask (nameH * 0.95f);
-                const float nameW = jmin (textWidth (nf, page.chordText (c)) + 20.0f, inner.getWidth() * 0.5f);
-                const float sideW = (inner.getWidth() - nameW) * 0.5f;
-                if (sideW >= 96.0f)
+                // One line of writing (long name - CHORD - notes), so the keyboard gets the rest of the card.
+                // A long chord name (D7sus4, F#m7b5) is drawn a little smaller to fit between the two. If the
+                // chord name or its long name still won't fit, the chord name gets the top line and the long
+                // name and notes share one line under it.
+                const String text = page.chordText (c);
+                const String sub = "(" + utf8 (c.longName (page.useFlats())) + ")";
+                const Font nf = page.assets.bask (nameH * 0.95f);
+                const float sideMin = jlimit (70.0f, 96.0f, inner.getWidth() * 0.27f);
+                const float room = inner.getWidth() - 2.0f * sideMin;              // the most the chord name can have
+                const float smallest = textWidth (nf.withHeight (nameH * 0.6f), text) + 12.0f;
+                L.sideBySide = true;
+                bool besideIt = false;
+                if (room >= smallest)
                 {
-                    L.sideBySide = true;
-                    auto top = inner.removeFromTop (nameH);
-                    L.longName = top.removeFromLeft (sideW).withTrimmedRight (6.0f);
-                    L.notes = top.removeFromRight (sideW).withTrimmedLeft (6.0f);
-                    L.name = top;
-                    inner.removeFromTop (jmax (6.0f, inner.getHeight() * 0.05f));
-                    keyboardSpan (L.low, L.whites);
-                    const float h = jmin (inner.getHeight(), inner.getWidth() / (float) L.whites * 5.5f);
-                    L.diagram = inner.withSizeKeepingCentre (inner.getWidth(), h);
-                    L.scale = h / 102.0f;
-                    return L;
+                    const float nameW = jmin (textWidth (nf, text) + 20.0f, room);
+                    const float sideW = (inner.getWidth() - nameW) * 0.5f;
+                    L.sideFont = jlimit (14.0f, 28.0f, jmin (jmax (17.0f, nameH * 0.42f), sideW * 0.2f));
+                    // two lines, squeezed a little, with some slack for where the words break
+                    besideIt = textWidth (page.assets.baskItalic (L.sideFont), sub) <= (sideW - 6.0f) * 2.0f / 0.8f * 0.85f;
+                    if (besideIt)
+                    {
+                        auto top = inner.removeFromTop (nameH);
+                        L.longName = top.removeFromLeft (sideW).withTrimmedRight (6.0f);
+                        L.notes = top.removeFromRight (sideW).withTrimmedLeft (6.0f);
+                        L.name = top;
+                    }
                 }
+                if (! besideIt)
+                {
+                    L.oneLineUnder = true;
+                    L.name = inner.removeFromTop (nameH * 0.85f);
+                    L.longName = L.notes = inner.removeFromTop (jlimit (18.0f, 30.0f, nameH * 0.5f));
+                }
+                inner.removeFromTop (jmax (6.0f, inner.getHeight() * 0.05f));
+                keyboardSpan (L.low, L.whites);
+                const float h = jmin (inner.getHeight(), inner.getWidth() / (float) L.whites * 5.5f);
+                L.diagram = inner.withSizeKeepingCentre (inner.getWidth(), h);
+                L.scale = h / 102.0f;
+                return L;
             }
 
             L.name = inner.removeFromTop (nameH);
@@ -4076,8 +4112,31 @@ namespace kcui
                 if (v.shown.isValid() && v.shown.quality != c.quality) sub += "  - plays " + page.chordText (v.shown);
             }
             g.setColour (Palette::inkSoft);
-            const float sideFont = jlimit (17.0f, 28.0f, L.name.getHeight() * 0.42f);
-            if (L.sideBySide)
+            const float sideFont = L.sideFont;
+            if (L.oneLineUnder)
+            {
+                // "(C# half-diminished over G#)   G#2 E4 G4 B4" on one line under the chord name
+                const auto notes = page.song.notesFor (c);
+                StringArray nn;
+                for (int n : notes) nn.add (utf8 (sm::pcName (n % 12, page.useFlats())) + String (n / 12 - 1));
+                const String noteText = nn.joinIntoString ("  ");
+                const auto row = L.longName;
+                Font f = page.assets.baskItalic (jlimit (15.0f, 24.0f, row.getHeight() * 0.82f));
+                const float gap = 18.0f;
+                auto widthAt = [&] (const Font& ft) { return textWidth (ft, sub) + gap + textWidth (ft, noteText); };
+                while (widthAt (f) > row.getWidth() && f.getHeight() > 13.0f) f = f.withHeight (f.getHeight() - 0.5f);
+                const float w1 = textWidth (f, sub), total = widthAt (f);
+                const float squeeze = jmin (1.0f, row.getWidth() / total);
+                Graphics::ScopedSaveState save (g);
+                g.addTransform (AffineTransform::scale (squeeze, 1.0f, row.getCentreX(), row.getCentreY()));
+                const float x = row.getCentreX() - total * 0.5f;
+                g.setFont (f);
+                g.drawText (sub, Rectangle<float> (x, row.getY(), w1 + 2.0f, row.getHeight()), Justification::centredLeft, false);
+                g.setColour (panelInk);
+                g.drawText (noteText, Rectangle<float> (x + w1 + gap, row.getY(), total - w1 - gap + 2.0f, row.getHeight()),
+                            Justification::centredLeft, false);
+            }
+            else if (L.sideBySide)
             {
                 g.setFont (page.assets.baskItalic (sideFont));
                 g.drawFittedText (sub, L.longName.toNearestInt(), Justification::centred, 2, 0.75f);
@@ -4109,6 +4168,7 @@ namespace kcui
             {
                 const auto notes = page.song.notesFor (c);
                 drawKeyboard (g, L.diagram, notes, L.low, L.whites, L.scale);
+                if (L.oneLineUnder) return;          // the notes are on the line with the long name
                 StringArray names;
                 for (int nn : notes) names.add (utf8 (sm::pcName (nn % 12, page.useFlats())) + String (nn / 12 - 1));
                 g.setColour (panelInk);
@@ -4519,7 +4579,7 @@ namespace kcui
         lockKey.onClick = [this] { setLockKey (lockKey.getToggleState()); };
         clearSong.setTooltip ("Clear Song: removes the chords and the bass and lead notes from every section and keeps the sections (Ctrl+Z brings them back)");
         clearSong.setMouseCursor (MouseCursor::PointingHandCursor);
-        clearSong.onClick = [this] { stopPlayback(); song.clearAllChords(); };
+        clearSong.onClick = [this] { clearSongChords(); };
         syncControls();
 
         header->setComponentID ("header");
@@ -4884,17 +4944,80 @@ namespace kcui
             if (out.empty() || out.back() != c) out.push_back (c);
         }
         if (out.size() > 8) out.erase (out.begin(), out.end() - 8);
-        if (out.empty()) return;
+        if (out.empty())
+        {
+            showNotice ("No chords heard yet\nPlay a few chords, then tap it again.");
+            return;
+        }
         song.setTray (out);
         focusChord (out.back(), false);
+        showNotice ("Chords captured\n" + chordList (out) + (out.size() == 1 ? " is" : " are") + " now the progression"
+                    + seeItOn (Spot::progression, ", on the ", " tab.", "."));
     }
 
     void SongMapperPage::addToSelectedSection (const std::vector<sm::Chord>& chords)
     {
-        if (chords.empty()) return;
+        if (chords.empty())
+        {
+            showNotice ("Nothing to add\nPut some chords in the progression first.");
+            return;
+        }
         if (song.sections.empty()) song.addSection ("Verse 1", 8);
         const int s = juce::isPositiveAndBelow (song.selectedSection, (int) song.sections.size()) ? song.selectedSection : 0;
         song.insertChords (s, chords);
+        const String section = song.sections[(size_t) s].name;
+        showNotice ((chords.size() == 1 ? chordText (chords.front()) + " added to " : "Chords added to ") + section
+                    + seeItOn (Spot::song, "\nIt's on the ", " tab."));
+    }
+
+    void SongMapperPage::useProgression (const std::vector<sm::Chord>& chords)
+    {
+        if (chords.empty()) return;
+        song.setTray (chords);
+        focusChord (chords.front(), false);
+        showNotice ("Chords added\n" + chordList (chords) + (chords.size() == 1 ? " is" : " are") + " now the progression"
+                    + seeItOn (Spot::progression, ", on the ", " tab.", "."));
+    }
+
+    void SongMapperPage::addAsNewSection (const std::vector<sm::Chord>& chords)
+    {
+        if (chords.empty()) return;
+        const int idx = song.addSection (song.nextSectionName ("Verse"), 8);
+        song.insertChords (idx, chords);
+        showNotice ("New section: " + song.sections[(size_t) idx].name + seeItOn (Spot::song, "\nIt's on the ", " tab."));
+    }
+
+    void SongMapperPage::clearProgression()
+    {
+        if (song.tray.empty()) return;
+        song.clearTray();
+        showNotice ("Progression cleared\nUndo brings it back.");
+    }
+
+    void SongMapperPage::clearSongChords()
+    {
+        stopPlayback();
+        bool any = false;
+        for (const auto& sec : song.sections)
+            any = any || ! sec.chords.empty() || ! sec.bass.notes.empty() || ! sec.lead.notes.empty();
+        song.clearAllChords();
+        showNotice (any ? "Song cleared\nThe chords and notes are gone; the sections stay. Undo brings them back."
+                        : "Nothing to clear\nThe song has no chords yet.");
+    }
+
+    String SongMapperPage::chordList (const std::vector<sm::Chord>& chords) const
+    {
+        StringArray names;
+        for (size_t i = 0; i < chords.size() && i < 8; ++i) names.add (chordText (chords[i]));
+        String out = names.joinIntoString (CharPointer_UTF8 (" \xc2\xb7 "));
+        if (chords.size() > 8) out << String (CharPointer_UTF8 (" \xe2\x80\xa6"));
+        return out;
+    }
+
+    String SongMapperPage::seeItOn (Spot spot, const String& before, const String& after, const String& otherwise) const
+    {
+        const String tab = tabShowing ? tabShowing ((int) spot) : String();
+        return tab.isEmpty() ? otherwise : before + tab + after;
     }
 
     File SongMapperPage::midiFile (int onlySection, int laneMask) const
@@ -4957,7 +5080,8 @@ namespace kcui
                                   auto dest = fc.getResult();
                                   if (dest == File()) return;
                                   if (! dest.hasFileExtension ("kcsong")) dest = dest.withFileExtension ("kcsong");
-                                  dest.replaceWithText (safe->songFileXml());
+                                  safe->showNotice (dest.replaceWithText (safe->songFileXml()) ? "Saved\n" + dest.getFullPathName()
+                                                                                                : "Couldn't save\n" + dest.getFullPathName());
                               });
     }
 
@@ -4997,6 +5121,7 @@ namespace kcui
         focused = song.tray.empty() ? sm::Chord() : song.tray[(size_t) jlimit (0, (int) song.tray.size() - 1, song.selectedTray)];
         song.changed();
         proc.getSongLink().importedSong();  // into My Songs (the same song if it came from another of your devices)
+        showNotice ("Opened \"" + song.songName + "\"\nUndo brings back what was here.");
         return true;
     }
 
@@ -5006,12 +5131,14 @@ namespace kcui
         const auto src = midiFile (onlySection);
         chooser = std::make_unique<FileChooser> ("Save MIDI file", File::getSpecialLocation (File::userDocumentsDirectory).getChildFile (src.getFileName()), "*.mid");
         chooser->launchAsync (FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::warnAboutOverwriting,
-                              [src] (const FileChooser& fc)
+                              [src, safe = SafePointer<SongMapperPage> (this)] (const FileChooser& fc)
                               {
                                   auto dest = fc.getResult();
                                   if (dest == File()) return;
                                   if (! dest.hasFileExtension ("mid")) dest = dest.withFileExtension ("mid");
-                                  src.copyFileTo (dest);
+                                  const bool ok = src.copyFileTo (dest);
+                                  if (safe != nullptr)
+                                      safe->showNotice ((ok ? "Saved\n" : "Couldn't save\n") + dest.getFullPathName());
                               });
     }
 
@@ -5028,6 +5155,8 @@ namespace kcui
         favourites->add ({ names.joinIntoString (" - "), rn.joinIntoString (" "), "My progressions" });
         song.showFavourites = true;
         song.changed();
+        showNotice ("Saved to favourites" + seeItOn (Spot::library, "\nIt's on the ", String (CharPointer_UTF8 (" tab, under \xe2\x98\x85 Favourites.")),
+                                                     String (CharPointer_UTF8 ("\nIt's in the library, under \xe2\x98\x85 Favourites."))));
     }
 
     void SongMapperPage::fillChordMenu (PopupMenu& m, int idBase, std::vector<sm::Chord>& out) const
@@ -5097,7 +5226,7 @@ namespace kcui
                              if (r == 2) { song.redo(); return; }
                              if (r == 3) { renameSong(); return; }
                              if (r == 4) { exportMidi (-1); return; }
-                             if (r == 5) { song.clearTray(); return; }
+                             if (r == 5) { clearProgression(); return; }
                              if (r == 6) { openManual(); return; }
                              if (r == 7) { saveSongFile(); return; }
                              if (r == 8) { openSongFile(); return; }
@@ -5132,7 +5261,9 @@ namespace kcui
             if (r < 11 || r > 19) return false;
             stopPlayback();
             closePractice();
+            const String old = song.songName;
             proc.getSongLink().newSong (t);       // a new song in My Songs; the old one stays there
+            showNotice ("New song started\n\"" + old + "\" is saved in My Songs.");
             return true;
     }
 
@@ -5284,13 +5415,14 @@ namespace kcui
         return mySongs != nullptr && mySongs->isVisible();
     }
 
-    void SongMapperPage::showNotice (const String& text)
+    void SongMapperPage::showNotice (const String& text, int milliseconds)
     {
         if (notice == nullptr) notice = std::make_unique<NoticeBanner> (assets);
         float scale;
         Rectangle<int> area;
         auto* host = overlayHost (scale, area);
-        notice->show (text, *host, area, scale);
+        if (milliseconds <= 0) milliseconds = jlimit (2500, 7000, 1500 + 55 * text.length());    // long enough to read
+        notice->show (text, *host, area, scale, milliseconds);
     }
 
     void SongMapperPage::askAboutNewerVersion()

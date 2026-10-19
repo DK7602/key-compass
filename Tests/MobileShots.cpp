@@ -319,6 +319,24 @@ namespace
             pump (400);
             check (song.songName == "Tap Test Song" && std::abs (song.manualBpm - 133.0) < 0.01 && ! ed.getMapper().isMySongsOpen(),
                    "a tap on a song opens it (and closes My Songs)");
+            {
+                auto* n = ed.getMapper().noticeBanner();
+                check (n != nullptr && n->isVisible() && n->getText().contains ("Opened"), "and says it opened it");
+            }
+            // the library's USE: the chords become the progression, and a message says so
+            song.clearTray();
+            ed.showTab (MobileEditor::libraryTab);
+            pump (300);                                   // (the library's rows are made again after a change)
+            if (auto* use = findButton (ed, "USE"))
+            {
+                f.tap (pointIn (ed, *use, 0.5f, 0.5f));
+                pump (300);
+                auto* n = ed.getMapper().noticeBanner();
+                check (! song.tray.empty(), "USE in the library fills the progression");
+                check (n != nullptr && n->isShowing() && n->getText().startsWith ("Chords added") && n->getText().contains ("CHORDS tab"),
+                       "and a message says \"Chords added\" (on the CHORDS tab)");
+            }
+            else check (false, "the library has a USE button");
             ed.getMapper().showMySongs (true);
             pump (200);
             check (ed.handleBackButton() && ed.getMapper().isMySongsOpen() && ! ed.getMapper().mySongsView()->isShowingCloud(),
@@ -480,7 +498,7 @@ int main (int argc, char* argv[])
                 pump (100);
             } },
         { "phone_notice",    412, 915, phoneBars, T::chordsTab, [] (MobileEditor& e)
-            { e.getMapper().showNotice ("Updated from your PC. Undo brings back what was here."); } },
+            { e.getMapper().showNotice ("Updated from your PC\nUndo brings back what was here."); } },
         { "side_mysongs",    915, 412, sideBars, T::songTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
         { "tablet_mysongs",  800, 1280, tabletBars, T::songTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
         { "small_mysongs",   360, 740, phoneBars, T::moreTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
@@ -498,6 +516,23 @@ int main (int argc, char* argv[])
             } },
         { "tablet_cloud_on", 800, 1280, tabletBars, T::songTab, [] (MobileEditor& e) { e.getMapper().showMySongs (true); } },
         { "phone_mysongs_synced", 412, 915, phoneBars, T::moreTab, [] (MobileEditor& e) { e.getMapper().showMySongs (false); } },
+        // confirmations, and practice cards with long chord names (these change the progression: keep them last)
+        { "phone_notice_use", 412, 915, phoneBars, T::libraryTab, [] (MobileEditor& e)
+            { e.getMapper().useProgression (sm::resolveProgression (sm::splitNumerals ("I V vi IV"), e.getMapper().currentKey())); } },
+        { "phone_notice_section", 412, 915, phoneBars, T::chordsTab, [] (MobileEditor& e)
+            { e.getMapper().addToSelectedSection (e.getMapper().song.tray); } },
+        { "phone_practice_long", 412, 915, phoneBars, T::chordsTab, [&proc] (MobileEditor& e)
+            {
+                std::vector<sm::Chord> long_;
+                for (auto* t : { "D7sus4", "F#m7b5", "Am7", "C#m7b5/G#" }) long_.push_back (sm::parseChord (t));
+                proc.getSongMap().guitar = false;
+                proc.getSongMap().setTray (long_);
+                proc.getSongMap().changed();
+                pump (100);
+                e.getMapper().showPractice (-2);
+            } },
+        { "small_practice_long", 360, 740, phoneBars, T::chordsTab, [] (MobileEditor& e) { e.getMapper().showPractice (-2); } },
+        { "tablet_practice_long", 800, 1280, tabletBars, T::chordsTab, [] (MobileEditor& e) { e.getMapper().showPractice (-2); } },
     };
 
     // a few songs in My Songs, made on different devices (and the open song saved there first)

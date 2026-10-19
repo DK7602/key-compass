@@ -43,6 +43,7 @@ namespace kcui
         void songMenu (const kcsync::Entry&, juce::Component& target);
         void renameSong (const kcsync::Entry&);
         void deleteSong (const kcsync::Entry&);
+        void openEntry (const kcsync::Entry&);   // open it, close My Songs and say so
         void chooseNewSong();
         void setBusy (bool b, const juce::String& message = {});
         void paintCloud (juce::Graphics&);
@@ -68,18 +69,20 @@ namespace kcui
         std::shared_ptr<bool> alive = std::make_shared<bool> (true);
     };
 
-    // A short message across the top for a few seconds ("Updated from your phone"); tap to dismiss
+    // A short message across the top for a few seconds; tap to dismiss. "Chords added\nThey're on the CHORDS tab."
+    // shows the first line as a heading.
     class NoticeBanner : public juce::Component, private juce::Timer
     {
     public:
         explicit NoticeBanner (Assets& a) : assets (a) { setInterceptsMouseClicks (true, false); }
-        void show (const juce::String& text, juce::Component& host, juce::Rectangle<int> area, float scale);
+        void show (const juce::String& text, juce::Component& host, juce::Rectangle<int> area, float scale, int milliseconds = 7000);
         void paint (juce::Graphics&) override;
         void mouseUp (const juce::MouseEvent&) override  { setVisible (false); }
         const juce::String& getText() const noexcept     { return message; }
     private:
         void timerCallback() override                    { stopTimer(); setVisible (false); }
+        juce::Font headingFont() const                   { return assets.cinzel (18.0f); }
         Assets& assets;
-        juce::String message;
+        juce::String message, heading, detail;      // a message's first line is its heading ("CHORDS ADDED")
     };
 }

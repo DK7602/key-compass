@@ -429,12 +429,12 @@ public:
         shareMidi.onClick = [this] { page.shareMidi (-1); };
         shareSong.onClick = [this] { page.shareSongFile(); };
         openSong.onClick = [this] { page.openSongFile(); };
-        clearSong.onClick = [this]
+        clearSong.onClick = [this] { page.clearSongChords(); };
+        clearHistory.onClick = [this]
         {
-            page.stopPlayback();
-            song.clearAllChords();
+            processor.getEngine().requestReset();
+            page.showNotice ("History cleared\nKey Compass starts listening afresh.");
         };
-        clearHistory.onClick = [this] { processor.getEngine().requestReset(); };
         manual.onClick = [] { openManual(); };
         for (auto* b : { &shareMidi, &shareSong, &openSong, &clearSong, &clearHistory, &manual })
             b->fontSize = 16.5f;
@@ -718,12 +718,31 @@ void MobileEditor::putMapperInCanvas (bool inCanvas)
         canvas.addChildComponent (page, 3);           // above the compass layers, below the shared plates
         page.setBounds (0, 0, kcui::Layout::designWidth, kcui::Layout::designHeight);
         page.practiceHost = nullptr;
+        page.tabShowing = nullptr;
     }
     else
     {
         addChildComponent (page);
         practiceLayer.toFront (false);
         page.practiceHost = [this] { return &practiceLayer; };
+        // which tab shows a panel (for "They're on the CHORDS tab."), or "" when it's on the screen now
+        page.tabShowing = [this] (int spot) -> String
+        {
+            const int shown = effectiveTab();
+            const bool onMapper = shown != compassTab && shown != moreTab;
+            if (spot == (int) SongMapperPage::Spot::progression)
+            {
+                if (onMapper && (panes == 3 || shown == chordsTab)) return {};
+                return panes == 3 ? "SONG MAPPER" : "CHORDS";
+            }
+            if (spot == (int) SongMapperPage::Spot::song)
+            {
+                if (onMapper && (panes >= 2 || shown == songTab)) return {};
+                return panes == 3 ? "SONG MAPPER" : (panes == 2 ? "CHORDS" : "SONG");
+            }
+            if (onMapper && (panes == 3 || shown == libraryTab)) return {};
+            return panes == 3 ? "SONG MAPPER" : "LIBRARY";
+        };
     }
 }
 

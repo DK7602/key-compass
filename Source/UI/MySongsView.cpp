@@ -83,8 +83,7 @@ namespace kcui
         {
             press.mouseUp();
             if (press.fired() || e.mods.isPopupMenu() || e.getDistanceFromDragStart() > 8) return;
-            view.link.openSong (entry.id);
-            if (view.onClose) view.onClose();
+            view.openEntry (entry);
         }
         void mouseEnter (const MouseEvent&) override    { repaint(); }
         void mouseExit (const MouseEvent&) override     { repaint(); }
@@ -471,13 +470,14 @@ namespace kcui
                   {
                       if (safe == nullptr || r == 0) return;
                       auto& lib = hub.getLibrary();
-                      if (r == 1)
-                      {
-                          link.openSong (e.id);
-                          if (onClose) onClose();
-                      }
+                      if (r == 1) openEntry (e);
                       else if (r == 2) renameSong (e);
-                      else if (r == 3) lib.duplicate (e.id, lib.uniqueName (e.name + " copy"), hub.getDevice());
+                      else if (r == 3)
+                      {
+                          const auto copyName = lib.uniqueName (e.name + " copy");
+                          lib.duplicate (e.id, copyName, hub.getDevice());
+                          page.showNotice ("Copy made\n\"" + copyName + "\" is in My Songs.");
+                      }
                       else if (r == 4) { if (isTouchUI()) page.shareSongFile(); else page.saveSongFile(); }
                       else if (r == 5) deleteSong (e);
                   });
@@ -504,11 +504,21 @@ namespace kcui
         if (hub.getCloud().isOn()) message << "\n\nIt goes from My Songs on all your devices.";
         AlertWindow::showAsync (MessageBoxOptions().withIconType (MessageBoxIconType::NoIcon).withTitle ("Delete song")
                                     .withMessage (message).withButton ("Delete").withButton ("Cancel").withAssociatedComponent (this),
-                                [safe = SafePointer<MySongsView> (this), id = e.id] (int r)
+                                [safe = SafePointer<MySongsView> (this), id = e.id, name = e.name] (int r)
                                 {
-                                    if (r == 1 && safe != nullptr)
-                                        safe->hub.getLibrary().remove (id, safe->hub.getDevice());
+                                    if (r != 1 || safe == nullptr) return;
+                                    safe->hub.getLibrary().remove (id, safe->hub.getDevice());
+                                    safe->page.showNotice ("Deleted \"" + name + "\"");
                                 });
+    }
+
+    void MySongsView::openEntry (const kcsync::Entry& e)
+    {
+        const bool already = e.id == link.currentId();
+        auto& p = page;                  // closing deletes this view a moment later
+        link.openSong (e.id);
+        if (onClose) onClose();
+        p.showNotice (already ? "\"" + e.name + "\" is open" : "Opened \"" + e.name + "\"");
     }
 
     void MySongsView::chooseNewSong()
@@ -525,17 +535,22 @@ namespace kcui
     }
 
     //==============================================================================
-    void NoticeBanner::show (const String& text, Component& host, Rectangle<int> area, float scale)
+    void NoticeBanner::show (const String& text, Component& host, Rectangle<int> area, float scale, int milliseconds)
     {
         message = text;
+        heading = text.upToFirstOccurrenceOf ("\n", false, false);
+        detail = text.fromFirstOccurrenceOf ("\n", false, false);
+        if (detail.isEmpty()) std::swap (heading, detail);        // one line: plain writing, no heading
         host.addAndMakeVisible (this);
         setTransform (AffineTransform::scale (scale));
         const auto a = area.toFloat() / scale;
         const float w = jmin (a.getWidth() - 16.0f, 520.0f);
-        const int h = textHeight (text, assets.bask (16.0f), (int) w - 28) + 24;
+        int h = 22;
+        if (heading.isNotEmpty()) h += textHeight (heading, headingFont(), (int) w - 28);
+        if (detail.isNotEmpty())  h += textHeight (detail, assets.bask (16.0f), (int) w - 28) + (heading.isNotEmpty() ? 2 : 0);
         setBounds (Rectangle<float> (a.getCentreX() - w / 2.0f, a.getY() + 8.0f, w, (float) jmax (48, h)).toNearestInt());
         toFront (false);
-        startTimer (7000);
+        startTimer (milliseconds);
         repaint();
     }
 
@@ -547,7 +562,8 @@ namespace kcui
         g.setColour (Palette::gold);
         g.drawRoundedRectangle (r.reduced (0.5f), 9.0f, 1.6f);
         AttributedString s;
-        s.append (message, assets.bask (16.0f), Palette::cream);
+        if (heading.isNotEmpty()) s.append (heading + (detail.isNotEmpty() ? "\n" : ""), headingFont(), Palette::goldLight);
+        if (detail.isNotEmpty())  s.append (detail, assets.bask (16.0f), Palette::cream);
         s.setJustification (Justification::centred);
         s.draw (g, r.reduced (14.0f, 10.0f));
     }

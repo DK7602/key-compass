@@ -136,8 +136,15 @@ namespace kcui
         void closeMySongs();
         bool isMySongsOpen() const noexcept;
         MySongsView* mySongsView() const noexcept     { return mySongs.get(); }
-        void showNotice (const juce::String& text);   // a short message across the top
+        void showNotice (const juce::String& text, int milliseconds = 0);   // a short message across the top (0: as long as it takes to read)
         NoticeBanner* noticeBanner() const noexcept   { return notice.get(); }
+        // Where a change shows up, for those messages: the phone app says which tab ("They're on the CHORDS tab.")
+        // when that panel isn't on the screen. Empty when it is (and always on the PC).
+        enum class Spot { progression = 0, song = 1, library = 2 };
+        std::function<juce::String (int spot)> tabShowing;          // set by the phone app: the tab name, or "" if on screen
+        // before + "CHORDS" + after when the panel is on another tab, otherwise 'otherwise'
+        juce::String seeItOn (Spot, const juce::String& before, const juce::String& after, const juce::String& otherwise = {}) const;
+        juce::String chordList (const std::vector<sm::Chord>&) const;   // "C · G · Am · F"
         void layoutOverlays();                        // the app's screen changed size
         void addTemplateItems (juce::PopupMenu&);     // "New song" choices (ids 11-19)
         bool startNewSong (int itemId);               // false if it isn't one of them
@@ -178,6 +185,10 @@ namespace kcui
         void tapTempo();
         void captureDetectedChords();
         void addToSelectedSection (const std::vector<sm::Chord>& chords);
+        void useProgression (const std::vector<sm::Chord>& chords);       // the library's USE: it becomes the progression
+        void addAsNewSection (const std::vector<sm::Chord>& chords);
+        void clearProgression();                                           // with a message (Undo brings it back)
+        void clearSongChords();
         juce::File midiFile (int onlySection, int laneMask = -1) const;   // -1 = every row that is showing
         int visibleLanes() const noexcept { return song.showLines ? sm::allLanes : sm::laneBit (sm::Lane::Chords); }
         int playLanes() const noexcept    { return visibleLanes() & song.audibleLanes(); }

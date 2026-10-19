@@ -251,7 +251,7 @@ namespace kcsync
                 song.songName = lib.uniqueName (song.songName + " (" + hub->getDevice() + " copy)");
                 song.changed();
                 saveNow();
-                notice ("This song was also changed on " + hub->yourDevice (rc.device) + ". Your version is now \""
+                notice ("Changed in two places\nThis song was also changed on " + hub->yourDevice (rc.device) + ". Your version is now \""
                         + song.songName + "\"; the other one is in My Songs.");
                 return;
             }
@@ -263,11 +263,11 @@ namespace kcsync
             if (newerFrom.isNotEmpty()) return;          // already asking about it
             if (onSongReplaced) onSongReplaced();
             loadFromLibrary (e, true);
-            notice ("Updated from " + hub->yourDevice (rc.device) + ". Undo brings back what was here.");
+            notice ("Updated from " + hub->yourDevice (rc.device) + "\nUndo brings back what was here.");
         }
         else if (rc.what == What::deleted)
         {
-            notice ("This song was deleted on " + hub->yourDevice (rc.device) + ". It stays open here; change anything to keep it.");
+            notice ("Deleted on " + hub->yourDevice (rc.device) + "\nThis song stays open here; change anything to keep it.");
         }
         else if (rc.what == What::forked)
         {
@@ -277,7 +277,7 @@ namespace kcsync
             song.songName = e.name;
             song.libraryStamp = e.modified;
             song.changed();
-            notice ("This song was also changed on " + hub->yourDevice (rc.device) + ". Your version is now \""
+            notice ("Changed in two places\nThis song was also changed on " + hub->yourDevice (rc.device) + ". Your version is now \""
                     + e.name + "\"; the other one is in My Songs.");
         }
     }
