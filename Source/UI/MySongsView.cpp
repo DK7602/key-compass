@@ -156,13 +156,24 @@ namespace kcui
         joinButton.onClick = [this, finished]
         {
             const auto typed = codeEditor.getText();
-            if (kcsync::CloudSync::normaliseCode (typed).isEmpty())
+            const auto code = kcsync::CloudSync::normaliseCode (typed);
+            if (code.isEmpty())
             {
                 setBusy (false, "That doesn't look like a sync code. It has 20 letters and numbers, like 7H3Q-M9XD-2PLA-W6RT-K4NE.");
                 return;
             }
+            auto& cloud = hub.getCloud();
+            if (cloud.isOn() && kcsync::CloudSync::normaliseCode (cloud.getCode()) == code)
+            {
+                setBusy (false, "This device already uses that code.");
+                return;
+            }
+            const bool switching = cloud.isOn();
             setBusy (true, utf8 ("Connecting\xe2\x80\xa6"));
-            hub.getCloud().join (typed, finished ("Joined. The songs from your other devices are on their way."));
+            codeEditor.clear();
+            cloud.join (typed, finished (switching ? "Done: this device now uses the same code as your other device. Its songs are being added there, "
+                                                     "and the songs from your other devices are on their way."
+                                                   : "Joined. The songs from your other devices are on their way."));
         };
         copyButton.onClick = [this]
         {
@@ -291,8 +302,10 @@ namespace kcui
             c->setVisible (! cloudPage);
         closeButton.setVisible (true);
         backButton.setVisible (cloudPage);
-        for (Component* c : { (Component*) &turnOnButton, (Component*) &codeEditor, (Component*) &joinButton })
-            c->setVisible (cloudPage && ! on);
+        turnOnButton.setVisible (cloudPage && ! on);
+        joinButton.setButtonText (on ? "USE THIS CODE" : "JOIN");
+        for (Component* c : { (Component*) &codeEditor, (Component*) &joinButton })     // also when on: use another device's code instead
+            c->setVisible (cloudPage);
         for (Component* c : { (Component*) &copyButton, (Component*) &syncNowButton, (Component*) &turnOffButton })
             c->setVisible (cloudPage && on);
         for (auto* b : { &turnOnButton, &joinButton, &copyButton, &syncNowButton, &turnOffButton })
@@ -393,7 +406,13 @@ namespace kcui
             syncNowButton.setBounds (row.removeFromLeft (half));
             row.removeFromLeft (10);
             turnOffButton.setBounds (row);
-            r.removeFromTop (14);
+            r.removeFromTop (22);
+            // turned on separately on two devices, each has its own code: one of them joins the other's
+            say ("ANOTHER DEVICE SHOWS A DIFFERENT CODE?", 0);
+            say ("Only one device should make a code; the others join it. Type the other device's code here to use "
+                 "that one instead. The songs on this device are added to it, nothing is lost.", 1);
+            button (codeEditor, 48);
+            button (joinButton);
         }
         if (cloudMessage.isNotEmpty())
             say (cloudMessage, 3);

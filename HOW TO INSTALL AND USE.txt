@@ -287,6 +287,9 @@ TROUBLESHOOTING
 - "The cloud doesn't know this sync code any more": the cloud copy was deleted from
   another device. TURN OFF, then TURN ON SYNC again and join the other devices to the
   new code.
+- Two devices show different sync codes (sync was turned on on both): on one of them,
+  type the other's code under "ANOTHER DEVICE SHOWS A DIFFERENT CODE?" and press
+  USE THIS CODE. Its songs are added to the other code's songs; nothing is lost.
 - The build failed: open build-log.txt in this folder; the error is near the bottom.
 - "Could not copy the plug-in": close Cubase and run Build and Install.bat again.
 - Song Mapper bass or lead sounds out of tune against the chords: the KEY at the top

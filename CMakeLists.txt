@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.22)
 
-project (KeyCompass VERSION 1.5.1 LANGUAGES C CXX)
+project (KeyCompass VERSION 1.5.2 LANGUAGES C CXX)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,7 +25,7 @@ option (KC_LINUX_TEST "Developer build for Linux without audio devices / X11 ext
 juce_add_plugin (KeyCompass
     COMPANY_NAME                "Key Compass"
     PRODUCT_NAME                "Key Compass"
-    VERSION                     1.5.1
+    VERSION                     1.5.2
     PLUGIN_MANUFACTURER_CODE    KcMp
     PLUGIN_CODE                 Kcmp
     FORMATS                     ${KC_FORMATS}

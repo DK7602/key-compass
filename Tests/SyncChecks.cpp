@@ -257,6 +257,27 @@ namespace synctest
         link.rename (before, "Renamed");
         check ("rename the open song", song.songName == "Renamed" && phoneLib.find (before).name == "Renamed");
 
+        // ---- turned on separately on both devices: the PC then uses the phone's code instead ----
+        {
+            done = false;
+            pcCloud.turnOnNew (finished);                    // the PC makes a second, different code
+            waitFor ([&] { return done; });
+            settle();
+            check ("turned on separately, the PC has a code of its own", ok && pcCloud.isOn() && pcCloud.getCode() != phoneCloud.getCode());
+            const auto lonely = SongLibrary::newId();
+            pcLib.save (lonely, songTree ("Only On The PC", 101.0), "PC");
+            syncBoth (true);
+            check ("which the phone doesn't see", ! phoneLib.find (lonely).isValid());
+            done = false;
+            pcCloud.join (phoneCloud.getCode(), finished);    // "ANOTHER DEVICE SHOWS A DIFFERENT CODE?"
+            waitFor ([&] { return done; });
+            settle();
+            syncBoth (true);
+            check ("the PC switches to the phone's code", ok && pcCloud.getCode() == phoneCloud.getCode());
+            check ("the PC's songs are added to it", phoneLib.find (lonely).isValid() && bpmOf (phoneLib.load (lonely)) == 101.0);
+            check ("and both have the same songs", phoneLib.list().size() == pcLib.list().size());
+        }
+
         // ---- turning sync off ----
         done = false;
         pcCloud.turnOff (false, finished);
