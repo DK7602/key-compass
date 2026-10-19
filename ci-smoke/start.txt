@@ -1,0 +1,17 @@
+priority=0 preferredOrder=0 match=0x108000 specificIndex=-1 isDefault=false
+com.keycompass.app/android.app.Activity
+  bash arg: -p
+  bash arg: com.keycompass.app
+  bash arg: -c
+  bash arg: android.intent.category.LAUNCHER
+  bash arg: 1
+args: [-p, com.keycompass.app, -c, android.intent.category.LAUNCHER, 1]
+ arg: "-p"
+ arg: "com.keycompass.app"
+ arg: "-c"
+ arg: "android.intent.category.LAUNCHER"
+ arg: "1"
+data="com.keycompass.app"
+data="android.intent.category.LAUNCHER"
+Events injected: 1
+## Network stats: elapsed time=63ms (0ms mobile, 0ms wifi, 63ms not connected)

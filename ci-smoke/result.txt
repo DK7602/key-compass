@@ -1,0 +1,8 @@
+closed a system box: Application Not Responding: com.google.android.apps.nexuslauncher
+screen 1080x2400 at 420 dpi
+found MY SONGS at 304,483
+found CLOUD SYNC at 648,354
+found TURN ON SYNC at 546,1077
+found TURN OFF… at 768,1427
+found Delete at 386,1484
+done
